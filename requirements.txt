@@ -1,0 +1,17 @@
+pandas
+scikit-learn
+nltk
+streamlit
+joblib
+pytest
+datasets
+torch
+torchvision
+Pillow
+easyocr
+ntscraper
+instaloader
+twikit
+telethon
+colorama
+transformers
