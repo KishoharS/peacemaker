@@ -25,7 +25,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from preprocessing_text import clean_text
 
 from instagram_utils import get_instagram_captions
-from twitter_utils import get_twitter_feed
 from scrapping import TelegramClient, ChannelManager, join_channel, scrape_messages
 
 
@@ -68,6 +67,7 @@ def load_audio_model():
 
 tokenizer, text_model = load_model()
 img_processor, img_model = load_image_model()
+# Audio model load omitted or moved to where it is used to save memory if needed
 audio_model = load_audio_model()
 
 # helper function for prediction
@@ -89,7 +89,7 @@ def predict_image(image):
 
 st.title("🕊️ Peacemaker: Cyberbullying Detection System")
 
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Text Analyzer", "Instagram", "Twitter", "Telegram", "Image Analyzer", "Audio Analyzer"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Text Analyzer", "Instagram", "Telegram", "Image Analyzer", "Audio Analyzer"])
 
 with tab1:
     st.header("Analyze Text/Comments")
@@ -162,7 +162,8 @@ with tab2:
                         try:
                             # Verify if it's a valid URL or skip
                             if image_url.startswith('http'):
-                                response = requests.get(image_url, timeout=5)
+                                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+                                response = requests.get(image_url, headers=headers, timeout=10)
                                 if response.status_code == 200:
                                     img = Image.open(BytesIO(response.content)).convert("RGB")
                                     img_pred, _ = predict_image(img)
@@ -199,82 +200,6 @@ with tab2:
                             st.write(f"[Image]({img_url})")
 
 with tab3:
-    st.header("X Profile Analyzer")
-    st.markdown("""
-    **Note:** This feature analyzes recent tweets of a user to determine if their content is toxic.
-    """)
-    
-    tw_username = st.text_input("Enter Twitter Handle (e.g. elonmusk)")
-    
-    if st.button("Analyze Tweets"):
-        if not tw_username:
-            st.warning("Please enter a handle.")
-        elif not tokenizer or not text_model:
-            st.error("Model not loaded.")
-        else:
-            with st.spinner(f"Fetching tweets for @{tw_username}..."):
-                tweets = get_twitter_feed(tw_username)
-            
-            if not tweets:
-                st.info("No tweets found.")
-            else:
-                if tweets[0].get('is_mock'):
-                    st.warning("⚠️ Live Twitter extraction failed (Nitter instances down). Showing **Mock Data** for demonstration.")
-                else:
-                    st.success("✅ Fetched real tweets from Nitter.")
-                    
-                st.write(f"Analyzed {len(tweets)} recent tweets.")
-                
-                toxic_count = 0
-                processed_tweets = []
-                for tweet in tweets:
-                    if isinstance(tweet, dict):
-                        text = tweet.get('text', '')
-                        image_url = tweet.get('image')
-                    else:
-                        text = str(tweet)
-                        image_url = None
-
-                    cleaned = clean_text(text)
-                    pred, _ = predict_toxicity(cleaned)
-                    
-                    # Image Analysis
-                    img_pred = 0
-                    if image_url and img_processor and img_model:
-                        try:
-                            if image_url.startswith('http'):
-                                response = requests.get(image_url, timeout=5)
-                                if response.status_code == 200:
-                                    img = Image.open(BytesIO(response.content)).convert("RGB")
-                                    img_pred, _ = predict_image(img)
-                        except:
-                            pass
-
-                    is_toxic = (pred == 1 or img_pred == 1)
-                    if is_toxic:
-                        toxic_count += 1
-                    
-                    processed_tweets.append({'text': text, 'is_toxic': is_toxic, 'image': image_url})
-
-                toxicity_score = (toxic_count / len(tweets)) * 100
-                
-                st.metric("Toxicity Score", f"{toxicity_score:.1f}%")
-                
-                if toxicity_score > 50:
-                    st.error(f"⚠️ High Risk: High indications of toxic behavior ({toxic_count}/{len(tweets)} toxic tweets).")
-                elif toxicity_score > 0:
-                    st.warning(f"⚠️ Moderate Risk: Some toxic content detected ({toxic_count}/{len(tweets)} tweets).")
-                else:
-                    st.success("✅ Safe Profile: No toxic content detected.")
-                    
-                with st.expander("View Analyzed Tweets"):
-                    for item in processed_tweets:
-                        status = "🔴" if item['is_toxic'] else "🟢"
-                        st.write(f"{status} {item['text']}")
-                        if item['image']:
-                            st.image(item['image'], width=200)
-
-with tab4:
     st.header("Telegram Channel Analyzer")
     st.markdown("""
     **Note:** This feature analyzes recent messages of a Telegram channel using Telethon modules from `scrapping.py`.
@@ -370,7 +295,7 @@ with tab4:
         else:
             st.warning("No messages fetched or failed to join the channel.")
 
-with tab5:
+with tab4:
     st.header("Image Analyzer")
     st.markdown("""
     **How Scoring Works:**
@@ -435,7 +360,7 @@ with tab5:
 
 st.markdown("---")
 
-with tab6:
+with tab5:
     st.header("Audio Analyzer (Toxic Speech Detection)")
     st.write("Upload an audio file (mp3, wav, m4a) to detect toxic speech.")
     

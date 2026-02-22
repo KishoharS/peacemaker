@@ -30,7 +30,7 @@ def get_instagram_captions(username, max_posts=30):
                 'image': image_url,
                 'shortcode': post.shortcode
             })
-            gx
+            
             count += 1
             if count >= max_posts:
                 break

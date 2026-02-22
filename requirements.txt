@@ -11,7 +11,7 @@ Pillow
 easyocr
 ntscraper
 instaloader
-twikit
+python-dotenv
 telethon
 colorama
 transformers
