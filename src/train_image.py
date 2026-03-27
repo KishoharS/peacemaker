@@ -1,6 +1,4 @@
-
-import os
-import torch
+kimport torch
 from datasets import load_dataset
 from transformers import ViTImageProcessor, ViTForImageClassification, TrainingArguments, Trainer
 from torchvision.transforms import (
@@ -30,7 +28,7 @@ def train_image_model():
         # We need 'image' column for input and 'label' for target
         # Check available columns
         cols = ds['train'].column_names
-        
+
         # Standardize 'image' column
         if 'img' in cols and 'image' not in cols:
             ds = ds.rename_column("img", "image")
@@ -48,8 +46,8 @@ def train_image_model():
                  ds = ds.rename_column("class", "label")
              elif 'answer' in cols: # Added for xyyyy2025/hateful_memes_dataset
                  ds = ds.rename_column("answer", "label")
-             
-        # Check if we have image column processing 
+
+        # Check if we have image column processing
         if 'image' not in ds['train'].column_names:
             print(f"Error: Dataset {dataset_name} does not seem to have an 'image' or 'img' column.")
             print(f"Columns found: {ds['train'].column_names}")
@@ -67,25 +65,25 @@ def train_image_model():
                 print(f"Renamed column '{image_col}' to 'image'.")
             else:
                  return # Cannot proceed without images
-        
+
         # Handle string labels (e.g. "yes"/"no", "hateful"/"not_hateful")
         if isinstance(ds['train'].features['label'], torch.dtype) == False and \
            not hasattr(ds['train'].features['label'], 'names'): # Ensure it's not already ClassLabel
-            
+
             # Get unique labels
             unique_labels = sorted(list(set(ds['train']['label'])))
             print(f"Found String Labels: {unique_labels}. Encoding to Integers...")
-            
+
             label2id = {label: i for i, label in enumerate(unique_labels)}
             id2label = {i: label for i, label in enumerate(unique_labels)}
-            
+
             def encode_labels(example):
                 example['label'] = label2id[example['label']]
                 return example
-            
+
             ds = ds.map(encode_labels)
             # Update detection logic later to use this map
-            
+
     except Exception as e:
         print(f"Critical Error loading dataset: {e}")
         return
@@ -93,7 +91,7 @@ def train_image_model():
     # 2. Config & Preprocessing
     model_name = "google/vit-base-patch16-224-in21k"
     processor = ViTImageProcessor.from_pretrained(model_name)
-    
+
     image_mean, image_std = processor.image_mean, processor.image_std
     size = processor.size["height"]
     normalize = Normalize(mean=image_mean, std=image_std)
@@ -122,7 +120,7 @@ def train_image_model():
 
             if isinstance(img, str):
                 # It's a path, load it.
-                # Assuming local path if string? Or URL? 
+                # Assuming local path if string? Or URL?
                 # HF datasets usually return PIL images directly for Image feature.
                 try:
                     img = Image.open(img).convert("RGB")
@@ -131,11 +129,11 @@ def train_image_model():
                     # Fallback or error
                     print(f"Error loading image path {img}: {e}")
                     # Use skipped image or dummy? Better to crash early to debug.
-                    return None 
+                    return None
             else:
                 # Assuming PIL Image
                 images.append(img.convert("RGB"))
-        
+
         examples['pixel_values'] = [transforms(img) for img in images]
         return examples
 
@@ -149,7 +147,7 @@ def train_image_model():
     if 'validation' not in ds:
         # Create split
         ds = ds['train'].train_test_split(test_size=0.1)
-        
+
     ds['train'].set_transform(train_transforms)
     # Handle test/validation naming
     val_key = 'validation' if 'validation' in ds else 'test'
@@ -177,7 +175,7 @@ def train_image_model():
         # Ensure keys are strings for config
         id2label = {str(k): v for k, v in id2label.items()}
 
-    
+
     print(f"Detected Labels: {labels}")
 
     model = ViTForImageClassification.from_pretrained(
@@ -195,7 +193,7 @@ def train_image_model():
         eval_strategy="epoch",
         save_strategy="epoch",
         num_train_epochs=3,
-        fp16=True, 
+        fp16=True,
         learning_rate=2e-5,
         save_total_limit=2,
         dataloader_num_workers=2, # Usually safe on Kaggle unless constrained resources
