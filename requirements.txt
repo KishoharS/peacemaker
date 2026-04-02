@@ -15,3 +15,5 @@ python-dotenv
 telethon
 colorama
 transformers
+flask
+flask-cors

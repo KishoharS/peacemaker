@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peacemaker - Cyberbullying Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0071e3;
+            --secondary-color: #f5f5f7;
+            --text-dark: #1d1d1d;
+            --text-gray: #666;
+            --border-light: #e5e5e7;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #ffffff;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 0.5rem 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 44px;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 44px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 32px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .cta-button:hover {
+            background: #0077ed;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 4rem 2rem;
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Features Section */
+        .features {
+            background: var(--secondary-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            background: white;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-light);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .tab-button:hover {
+            color: var(--text-dark);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .input-box {
+            background: var(--secondary-color);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .input-box h4 {
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            background: white;
+            border: 2px dashed var(--border-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background: #f5f5f7;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .submit-button:hover {
+            background: #0077ed;
+        }
+
+        .submit-button:active {
+            transform: scale(0.98);
+        }
+
+        .results-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .result-value {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .threat-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .threat-high {
+            background: #fcd3d3;
+            color: #d00;
+        }
+
+        .threat-medium {
+            background: #ffeaa7;
+            color: #ff9800;
+        }
+
+        .threat-low {
+            background: #dff0d8;
+            color: #078;
+        }
+
+        /* Technical Section */
+        .technical-section {
+            background: var(--secondary-color);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tech-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .tech-box h4 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tech-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-box li {
+            padding: 0.5rem 0;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .tech-box li:before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            margin-right: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .architecture {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+
+        .architecture h4 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .flow-item {
+            background: var(--secondary-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .flow-arrow {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin: 0 0.5rem;
+        }
+
+        /* Team Section */
+        .team-section {
+            background: white;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .team-card {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.1);
+        }
+
+        .team-image {
+            width: 100%;
+            height: 250px;
+            background: #e5e5e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .team-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-info {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .team-info h3 {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .team-role {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .team-bio {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-color);
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border-light);
+            margin-top: 4rem;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #e5e5e7;
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#home" class="logo">Peacemaker</a>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#technical">Technical</a></li>
+            <li><a href="#team">Team</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Detect and Prevent Cyberbullying</h1>
+            <p>Peacemaker uses advanced machine learning to detect cyberbullying across text, images, and audio—providing real-time protection for online communities.</p>
+            <a href="#demo" class="cta-button">Try Now</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-container">
+            <h2 class="section-title">Capabilities</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Text Analysis</h3>
+                    <p>Advanced NLP using DistilBERT to detect cyberbullying patterns in written content across social platforms.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Image Detection</h3>
+                    <p>Vision Transformer technology to identify inappropriate or harmful visual content with high accuracy.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Audio Analysis</h3>
+                    <p>Whisper AI integration for real-time transcription and analysis of speech-based harassment.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Social Media Integration</h3>
+                    <p>Direct monitoring of Instagram and Telegram for seamless threat detection and alerts.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Real-time Processing</h3>
+                    <p>Lightning-fast analysis with minimal latency for immediate threat response and intervention.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Detailed Reports</h3>
+                    <p>Comprehensive analytics dashboard for tracking trends and understanding behavioral patterns.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo-section">
+        <div class="section-container">
+            <h2 class="section-title">Test the System</h2>
+            <p style="text-align: center; color: var(--text-gray); margin-bottom: 2rem; font-size: 1rem;">
+                Try our detection models in real-time. Input your content and receive instant results.
+            </p>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="text">Text Analysis</button>
+                <button class="tab-button" data-tab="image">Image Detection</button>
+                <button class="tab-button" data-tab="audio">Audio Analysis</button>
+                <button class="tab-button" data-tab="social">Social Media</button>
+            </div>
+
+            <!-- Text Analysis Tab -->
+            <div id="text" class="tab-content active">
+                <div class="input-grid">
+                    <div class="input-box">
+                        <h4>Analyze Text</h4>
+                        <div class="form-group">
+                            <label>Enter text to analyze</label>
+                            <textarea id="textInput" placeholder="Paste or type content to analyze..."></textarea>
+                        </div>
+                        <button class="submit-button" onclick="analyzeText()">Analyze</button>
+                    </div>
+
+                    <div class="input-box">
+                        <h4>Results</h4>
+                        <div id="textResults" class="results-box">
+                            <div class="result-item">
+                                <span class="result-label">Detection</span>
+                                <span id="textThreat"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Confidence</span>
+                                <span id="textConfidencePercent"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
+                                <span style="color: var(--text-gray);" id="textAnalysis"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Detection Tab -->
+            <div id="image" class="tab-content">
+                <div class="input-grid">
+                    <div class="input-box">
+                        <h4>Upload Image</h4>
+                        <div class="form-group">
+                            <div class="file-upload">
+                                <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+                                <label for="imageInput" class="file-upload-label">
+                                    <span>Click to upload or drag image</span>
+                                </label>
+                            </div>
+                            <div id="imagePreview" style="margin-top: 1rem; display: none;">
+                                <img id="previewImg" style="max-width: 100%; border-radius: 8px; max-height: 300px;">
+                            </div>
+                        </div>
+                        <button class="submit-button" onclick="analyzeImage()">Analyze Image</button>
+                    </div>
+
+                    <div class="input-box">
+                        <h4>Results</h4>
+                        <div id="imageResults" class="results-box">
+                            <div class="result-item">
+                                <span class="result-label">Status</span>
+                                <span id="imageThreat"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Confidence</span>
+                                <span id="imageConfidencePercent"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
+                                <span style="color: var(--text-gray);" id="imageAnalysis"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Analysis Tab -->
+            <div id="audio" class="tab-content">
+                <div class="input-grid">
+                    <div class="input-box">
+                        <h4>Upload Audio</h4>
+                        <div class="form-group">
+                            <div class="file-upload">
+                                <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
+                                <label for="audioInput" class="file-upload-label">
+                                    <span>Click to upload or drag audio file</span>
+                                </label>
+                            </div>
+                            <div id="audioPreview" style="margin-top: 1rem; display: none;">
+                                <audio id="previewAudio" controls style="width: 100%; border-radius: 8px;"></audio>
+                            </div>
+                        </div>
+                        <button class="submit-button" onclick="analyzeAudio()">Analyze Audio</button>
+                    </div>
+
+                    <div class="input-box">
+                        <h4>Results</h4>
+                        <div id="audioResults" class="results-box">
+                            <div class="result-item">
+                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Transcription</span>
+                                <span style="color: var(--text-gray);" id="audioTranscript"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Threat Detected</span>
+                                <span id="audioThreat"></span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Confidence</span>
+                                <span id="audioConfidencePercent"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Tab -->
+            <div id="social" class="tab-content">
+                <div class="input-box" style="max-width: 800px; margin: 0 auto;">
+                    <h4>Analyze Social Media Account</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label>Select Platform</label>
+                            <select id="socialPlatform" style="width: 100%; padding: 10px 12px; background: white; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-dark); font-size: 0.95rem;">
+                                <option value="">Choose platform...</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="telegram">Telegram</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="socialUsername" placeholder="@username or handle">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Posts to Analyze</label>
+                        <input type="number" id="postsCount" value="10" min="1" max="100" style="width: 100%; padding: 10px 12px; background: white; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-dark); font-size: 0.95rem;">
+                    </div>
+
+                    <button class="submit-button" onclick="analyzeSocialMedia()">Scan Account</button>
+
+                    <div id="socialResults" class="results-box">
+                        <div class="result-item">
+                            <span class="result-label">Posts Analyzed</span>
+                            <span id="postsAnalyzed">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Bullying Detected</span>
+                            <span id="bullyingDetected">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Risk Level</span>
+                            <span id="riskLevel"></span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Recommendation</span>
+                            <span style="color: var(--text-gray);" id="recommendation"></span>
+                        </div>
+                        <div id="threatsList" style="margin-top: 1.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Section -->
+    <section id="technical" class="technical-section">
+        <div class="section-container">
+            <h2 class="section-title">Technical Architecture</h2>
+            
+            <div class="tech-grid">
+                <div class="tech-box">
+                    <h4>Machine Learning Models</h4>
+                    <ul>
+                        <li>DistilBERT for text classification</li>
+                        <li>Vision Transformer for image analysis</li>
+                        <li>Whisper for audio transcription</li>
+                        <li>Advanced preprocessing pipelines</li>
+                    </ul>
+                </div>
+
+                <div class="tech-box">
+                    <h4>Technology Stack</h4>
+                    <ul>
+                        <li>Python with PyTorch</li>
+                        <li>Transformers library</li>
+                        <li>FastAPI backend</li>
+                        <li>scikit-learn for utilities</li>
+                    </ul>
+                </div>
+
+                <div class="tech-box">
+                    <h4>Integration APIs</h4>
+                    <ul>
+                        <li>Instagram social graph</li>
+                        <li>Telegram messaging APIs</li>
+                        <li>EasyOCR for text extraction</li>
+                        <li>Real-time message streaming</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="architecture">
+                <h4>Processing Pipeline</h4>
+                <div class="flow-diagram">
+                    <div class="flow-item">Input</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">Preprocessing</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">Model</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">Classification</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">Report</div>
+                </div>
+            </div>
+
+            <div class="architecture">
+                <h4>Model Details</h4>
+                <p style="color: var(--text-gray); line-height: 1.8;">
+                    <strong>DistilBERT:</strong> A lightweight transformer model trained for binary classification of cyberbullying content. Processes up to 512 tokens per input with confidence scoring.<br><br>
+                    <strong>Vision Transformer:</strong> Segments images into patches and processes through transformer layers to detect harmful visual content with high precision.<br><br>
+                    <strong>Whisper:</strong> OpenAI's multilingual speech recognition model for transcribing and analyzing audio content in real-time.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="team-section">
+        <div class="section-container">
+            <h2 class="section-title">Our Team</h2>
+            
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" alt="Team Member">
+                    </div>
+                    <div class="team-info">
+                        <h3>Member Name</h3>
+                        <div class="team-role">Lead Engineer</div>
+                        <p class="team-bio">Specializes in machine learning architecture and model optimization.</p>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="Team Member">
+                    </div>
+                    <div class="team-info">
+                        <h3>Member Name</h3>
+                        <div class="team-role">Data Scientist</div>
+                        <p class="team-bio">Focuses on data analysis, training, and model evaluation.</p>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" alt="Team Member">
+                    </div>
+                    <div class="team-info">
+                        <h3>Member Name</h3>
+                        <div class="team-role">Full Stack Developer</div>
+                        <p class="team-bio">Builds the web application and user interfaces.</p>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="Team Member">
+                    </div>
+                    <div class="team-info">
+                        <h3>Member Name</h3>
+                        <div class="team-role">DevOps Engineer</div>
+                        <p class="team-bio">Manages deployment and system infrastructure.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Peacemaker - Cyberbullying Detection System</p>
+        <p style="font-size: 0.85rem;">Building safer online communities through intelligent technology</p>
+        <p style="margin-top: 1rem; font-size: 0.85rem;">Copyright 2026. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(tabName).classList.add('active');
+                this.classList.add('active');
+            });
+        });
+
+        // Analyze Text
+        async function analyzeText() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                alert('Please enter text to analyze');
+                return;
+            }
+
+            const resultsBox = document.getElementById('textResults');
+            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></div>';
+            resultsBox.classList.add('show');
+
+            try {
+                const response = await fetch('http://localhost:8001/api/analyze-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                const threatColor = data.threat_level === 'high' ? 'threat-high' : 
+                                   data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
+                const threatText = data.is_cyberbullying ? 'Cyberbullying Detected' : 'No Threat Detected';
+
+                resultsBox.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">Detection</span>
+                        <span class="threat-badge ${threatColor}">${threatText}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Confidence</span>
+                        <span>${data.confidence.toFixed(1)}%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
+                        <span style="color: var(--text-gray);">${data.analysis}</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('API Error:', error);
+                resultsBox.innerHTML = `
+                    <div class="result-item">
+                        <span style="color: #d00;">Error: ${error.message}<br><br>Make sure:<br>1. Backend is running: <code>python3 backend_api.py</code><br>2. Port 5000 is accessible</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Preview Image
+        function previewImage() {
+            const file = document.getElementById('imageInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Analyze Image
+        async function analyzeImage() {
+            const file = document.getElementById('imageInput').files[0];
+            if (!file) {
+                alert('Please upload an image first');
+                return;
+            }
+
+            const resultsBox = document.getElementById('imageResults');
+            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></div>';
+            resultsBox.classList.add('show');
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const imageData = e.target.result;
+                        const response = await fetch('http://localhost:8001/api/analyze-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: imageData })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        const threatColor = data.threat_level === 'high' ? 'threat-high' : 
+                                           data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
+                        const threatText = data.is_harmful ? 'Content Flagged' : 'Content Clear';
+
+                        resultsBox.innerHTML = `
+                            <div class="result-item">
+                                <span class="result-label">Status</span>
+                                <span class="threat-badge ${threatColor}">${threatText}</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Confidence</span>
+                                <span>${data.confidence.toFixed(1)}%</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
+                                <span style="color: var(--text-gray);">${data.analysis}</span>
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error('Image Analysis Error:', error);
+                        resultsBox.innerHTML = `
+                            <div class="result-item">
+                                <span style="color: #d00;">Error: ${error.message}</span>
+                            </div>
+                        `;
+                    }
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                resultsBox.innerHTML = `
+                    <div class="result-item">
+                        <span style="color: #d00;">Error: ${error.message}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Preview Audio
+        function previewAudio() {
+            const file = document.getElementById('audioInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewAudio').src = e.target.result;
+                    document.getElementById('audioPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Analyze Audio
+        function analyzeAudio() {
+            if (!document.getElementById('audioInput').files[0]) {
+                alert('Please upload an audio file first');
+                return;
+            }
+            alert('Audio analysis coming soon');
+        }
+
+        // Analyze Social Media
+        async function analyzeSocialMedia() {
+            const platform = document.getElementById('socialPlatform').value;
+            const username = document.getElementById('socialUsername').value;
+            const postsCount = document.getElementById('postsCount').value;
+
+            if (!platform || !username) {
+                alert('Please select a platform and enter a username');
+                return;
+            }
+
+            const resultsBox = document.getElementById('socialResults');
+            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div> <p style="margin-top: 1rem; color: var(--text-gray);">Scanning account... This may take a moment.</p></div>';
+            resultsBox.classList.add('show');
+
+            try {
+                const response = await fetch('http://localhost:8001/api/analyze-social', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform, username, count: parseInt(postsCount) })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                const riskColor = data.threat_level === 'high' ? 'threat-high' : 
+                                 data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
+
+                let allPostsHtml = '';
+                if (data.all_posts && data.all_posts.length > 0) {
+                    allPostsHtml = '<h4 style="color: var(--text-dark); margin-bottom: 1rem; margin-top: 1.5rem;">All Analyzed Posts:</h4>';
+                    data.all_posts.forEach((post, idx) => {
+                        const imageHtml = post.image ? `<img src="${post.image}" style="width: 100%; border-radius: 6px; margin: 0.8rem 0; max-height: 300px; object-fit: cover;">` : '';
+                        const borderColor = post.is_bullying ? '#d00' : '#4CAF50';
+                        const bgColor = post.is_bullying ? 'rgba(208, 0, 0, 0.05)' : 'rgba(76, 175, 80, 0.05)';
+                        const badge = post.is_bullying ? '<span style="display: inline-block; background: #d00; color: white; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">🚨 BULLYING DETECTED</span>' : '<span style="display: inline-block; background: #4CAF50; color: white; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">✓ SAFE</span>';
+                        allPostsHtml += `
+                            <div style="background: ${bgColor}; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${borderColor};">
+                                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.3rem;">Post ${idx + 1} ${badge}</div>
+                                ${imageHtml}
+                                <div style="color: var(--text-dark); font-size: 0.95rem; margin-bottom: 0.5rem; word-break: break-word; line-height: 1.4;">"${post.full_content}"</div>
+                                <div style="font-size: 0.85rem; color: var(--text-gray);">
+                                    <strong>Cyberbullying Confidence:</strong> ${post.confidence}% | 
+                                    <strong>Severity:</strong> ${post.severity.toUpperCase()} | 
+                                    <strong>Likes:</strong> ${post.likes}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                let threatsHtml = '';
+                if (data.threats && data.threats.length > 0) {
+                    threatsHtml = '<h4 style="color: var(--text-dark); margin-bottom: 1rem; margin-top: 1.5rem; color: #d00;">⚠️ Flagged Threats Summary:</h4>';
+                    data.threats.forEach((threat, idx) => {
+                        threatsHtml += `
+                            <div style="background: rgba(208, 0, 0, 0.1); padding: 0.8rem; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid #d00; font-size: 0.9rem;">
+                                <strong>Post ${idx + 1}:</strong> ${threat.confidence}% confidence (${threat.severity})
+                            </div>
+                        `;
+                    });
+                }
+
+                resultsBox.innerHTML = `
+                    <div class="result-item">
+                        <span class="result-label">Posts Analyzed</span>
+                        <span>${data.posts_analyzed}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Bullying Detected</span>
+                        <span>${data.bullying_detected}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Percentage</span>
+                        <span>${data.percentage}%</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Risk Level</span>
+                        <span class="threat-badge ${riskColor}">${data.threat_level.toUpperCase()}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Recommendation</span>
+                        <span style="color: var(--text-gray);">${data.recommendation}</span>
+                    </div>
+                    ${allPostsHtml}
+                    ${threatsHtml}
+                `;
+            } catch (error) {
+                console.error('Social Media Analysis Error:', error);
+                resultsBox.innerHTML = `
+                    <div class="result-item">
+                        <span style="color: #d00;">Error: ${error.message}<br><br>Make sure the account exists and is public. Analysis requires internet connection.</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

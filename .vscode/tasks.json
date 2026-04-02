@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Backend API",
+			"type": "shell",
+			"command": "python3 backend_api.py",
+			"isBackground": true
+		},
+		{
+			"label": "Backend API",
+			"type": "shell",
+			"command": "sh start_backend.sh",
+			"isBackground": true
+		}
+	]
+}
