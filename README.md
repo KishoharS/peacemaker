@@ -4,7 +4,6 @@
 This project detects cyberbullying in text and images using Machine Learning (DistilBERT and Vision Transformer). It includes a training pipeline and a web interface for real-time predictions.
 
 ## Structure
-- `data/`: Datasets.
 - `models/`: Saved trained models (Ignored in Git, generated via training scripts).
 - `src/`: Source code for preprocessing and training pipelines.
 - `app/`: Streamlit web application.
