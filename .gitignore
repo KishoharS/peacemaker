@@ -12,6 +12,8 @@ venv/
 results/
 models/
 backend.log
-sessions/,
+sessions/
 eval_outputs/
-eval_outputs_*
+eval_outputs_*/
+.vscode/
+*.log
