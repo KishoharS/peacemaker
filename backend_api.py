@@ -11,6 +11,22 @@ from io import BytesIO
 import base64
 import json
 
+import re
+import string
+from transformers import AutoModel, AutoTokenizer
+
+import open_clip
+
+def clean_ocr_text(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\@\w+|\#', '', text)
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    text = " ".join(text.split())
+    return text
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
@@ -31,6 +47,19 @@ try:
 except:
     print("Vision Transformer model not found")
     vit_available = False
+
+print("Loading CLIP model...")
+clip_model, _, clip_preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='openai')
+clip_tokenizer = open_clip.get_tokenizer('ViT-B-32')
+clip_model.eval()
+
+CLIP_LABELS = [
+    "a safe normal image with no threats",
+    "a weapon used to threaten someone",
+    "violent threatening image with text overlay",
+    "hate speech or harassment content",
+    "nudity or sexual content",
+]
 
 @app.route('/api/analyze-text', methods=['POST'])
 def analyze_text():
@@ -74,51 +103,53 @@ def analyze_text():
 @app.route('/api/analyze-image', methods=['POST'])
 def analyze_image():
     try:
-        if not vit_available:
-            return jsonify({'error': 'Vision Transformer model not loaded'}), 503
-        
         data = request.json
         image_data = data.get('image', '')
-        
+
         if not image_data:
             return jsonify({'error': 'Image data is required'}), 400
-        
+
         # Decode base64 image
         image_bytes = base64.b64decode(image_data.split(',')[1] if ',' in image_data else image_data)
         image = Image.open(BytesIO(image_bytes)).convert('RGB')
-        
-        # Process and predict
-        inputs = vit_processor(images=image, return_tensors='pt')
-        
+
+        # --- CLIP classification ---
+        clip_input = clip_preprocess(image).unsqueeze(0)
+        text_tokens = clip_tokenizer(CLIP_LABELS)
+
         with torch.no_grad():
-            outputs = vit_model(**inputs)
-        
-        logits = outputs.logits
-        probabilities = torch.softmax(logits, dim=-1)
-        predicted_class = torch.argmax(probabilities, dim=-1).item()
-        
-        confidence = probabilities[0].max().item() * 100
-        
-        # Determine threat level
-        if confidence > 80:
+            image_features = clip_model.encode_image(clip_input)
+            text_features = clip_model.encode_text(text_tokens)
+            image_features /= image_features.norm(dim=-1, keepdim=True)
+            text_features /= text_features.norm(dim=-1, keepdim=True)
+            probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+
+        # First label is "safe", rest are harmful
+        safe_score = probs[0][0].item() * 100
+        harmful_score = max(probs[0][1:]).item() * 100
+        is_harmful = harmful_score > 40
+
+        # Find which harmful label triggered
+        scores = {label: round(probs[0][i].item() * 100, 1) 
+                  for i, label in enumerate(CLIP_LABELS)}
+
+        if harmful_score > 80:
             threat_level = 'high'
-        elif confidence > 60:
+        elif harmful_score > 50:
             threat_level = 'medium'
         else:
             threat_level = 'low'
-        
-        is_harmful = predicted_class == 1
-        
+
         return jsonify({
             'is_harmful': is_harmful,
-            'confidence': round(confidence, 2),
+            'confidence': round(harmful_score, 2),
             'threat_level': threat_level,
-            'analysis': f"Image {'contains inappropriate content' if is_harmful else 'appears safe'} with {confidence:.1f}% confidence."
+            'label_scores': scores,
+            'analysis': f"Image {'contains harmful content' if is_harmful else 'appears safe'} with {harmful_score:.1f}% confidence."
         })
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 @app.route('/api/analyze-social', methods=['POST'])
 def analyze_social():
     try:

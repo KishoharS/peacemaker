@@ -1,3 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import asyncio
 import importlib
 import os
@@ -6,6 +13,7 @@ import re
 import sys
 import tempfile
 from io import BytesIO
+import base64
 
 import pandas as pd
 import requests
@@ -20,9 +28,20 @@ from transformers import (
     ViTImageProcessor,
 )
 
+from src.instagram_utils import get_loader, get_instagram_posts
+from backend_api import analyze_image
+
+@st.cache_resource
+def load_session():
+    return get_loader(
+        username=os.getenv("IG_USERNAME"),
+        password=os.getenv("IG_PASSWORD")
+    )
+
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-from instagram_utils import get_instagram_captions
-from preprocessing_text import clean_text
+from src.instagram_utils import get_loader, get_instagram_posts
+from src.preprocessing_text import clean_text
 from scrapping import ChannelManager, TelegramClient, join_channel, scrape_messages
 
 
@@ -96,134 +115,10 @@ def predict_image(image):
 st.title("🕊️ Peacemaker: Cyberbullying Detection System")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["Text Analyzer", "Instagram", "Telegram", "Image Analyzer", "Audio Analyzer"]
+    ["Telegram", "Instagram", "Text Analyzer", "Image Analyzer", "Audio Analyzer"]
 )
 
 with tab1:
-    st.header("Analyze Text/Comments")
-    st.write(
-        "Paste your comments below to see whether you're being cyberbullied or not!!."
-    )
-
-    text_input = st.text_area("Input Text", height=150)
-
-    if st.button("Analyze Text"):
-        if not tokenizer or not text_model:
-            st.error(
-                "Model artifacts not found. Please train the model and download artifacts to models/bert_model."
-            )
-        elif text_input.strip() == "":
-            st.warning("Please enter some text.")
-        else:
-            # Preprocess
-            cleaned_text = clean_text(text_input)
-
-            # Predict
-            try:
-                prediction, probabilities = predict_toxicity(cleaned_text)
-
-                if prediction == 1:
-                    st.error("⚠️ Application Detected: **Cyberbullying**")
-                    st.write(f"Confidence: {probabilities[1] * 100:.2f}%")
-                else:
-                    st.success("✅ Application Detected: **Non-Cyberbullying**")
-                    st.write(f"Confidence: {probabilities[0] * 100:.2f}%")
-            except Exception as e:
-                st.error(f"Error during prediction: {e}")
-
-
-with tab2:
-    st.header("Instagram Profile Analyzer")
-    st.markdown("""
-    **Note:** This feature analyzes the public posts, captions of a user to determine if their content is toxic.
-    """)
-
-    username = st.text_input("Enter Instagram Username (e.g. ig_kishohar)")
-
-    if st.button("Analyze Profile"):
-        if not username:
-            st.warning("Please enter a username.")
-        elif not tokenizer or not text_model:
-            st.error("Model not loaded.")
-        else:
-            with st.spinner(f"Fetching posts for {username}..."):
-                captions = get_instagram_captions(username)
-
-            if not captions:
-                st.info("No captions found to analyze.")
-            else:
-                st.write(f"Analyzed {len(captions)} recent posts.")
-
-                toxic_count = 0
-                for post in captions:
-                    # Handle new dict structure
-                    if isinstance(post, dict):
-                        text_content = post.get("text", "")
-                        image_url = post.get("image")
-                    else:
-                        text_content = str(post)
-                        image_url = None
-
-                    # Text Analysis
-                    cleaned = clean_text(text_content)
-                    pred, _ = predict_toxicity(cleaned)
-
-                    # Image Analysis (if available and model loaded)
-                    img_pred = 0
-                    if image_url and img_processor and img_model:
-                        try:
-                            # Verify if it's a valid URL or skip
-                            if image_url.startswith("http"):
-                                headers = {
-                                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-                                }
-                                response = requests.get(
-                                    image_url, headers=headers, timeout=10
-                                )
-                                if response.status_code == 200:
-                                    img = Image.open(BytesIO(response.content)).convert(
-                                        "RGB"
-                                    )
-                                    img_pred, _ = predict_image(img)
-                        except Exception as e:
-                            # print(f"Image analysis failed: {e}")
-                            pass
-
-                    # Combined toxicity (if either is toxic)
-                    if pred == 1 or img_pred == 1:
-                        toxic_count += 1
-
-                toxicity_score = (toxic_count / len(captions)) * 100
-
-                st.metric("Toxicity Score", f"{toxicity_score:.1f}%")
-
-                if toxicity_score > 50:
-                    st.error(
-                        f"⚠️ High Risk: This profile has high indications of toxic behavior ({toxic_count}/{len(captions)} toxic posts)."
-                    )
-                elif toxicity_score > 0:
-                    st.warning(
-                        f"⚠️ Moderate Risk: Some toxic content detected ({toxic_count}/{len(captions)} posts)."
-                    )
-                else:
-                    st.success(
-                        "✅ Safe Profile: No toxic content detected in recent posts."
-                    )
-
-                with st.expander("View Analyzed Posts"):
-                    for post in captions:
-                        if isinstance(post, dict):
-                            text = post.get("text", "")
-                            img_url = post.get("image")
-                        else:
-                            text = str(post)
-                            img_url = None
-
-                        st.text(f"{text[:100]}...")
-                        if img_url:
-                            st.write(f"[Image]({img_url})")
-
-with tab3:
     st.header("Telegram Channel Analyzer")
     st.markdown("""
     **Note:** This feature analyzes recent messages of a Telegram channel using Telethon modules from `scrapping.py`.
@@ -337,18 +232,143 @@ with tab3:
         else:
             st.warning("No messages fetched or failed to join the channel.")
 
+
+with tab2:
+    st.header("Instagram Profile Analyzer")
+    st.markdown("""
+    **Note:** This feature analyzes the public posts and captions of a user 
+    to determine if their content is toxic.
+    """)
+
+    username = st.text_input("Enter Instagram Username (e.g. ig_kishohar)")
+
+    if st.button("Analyze Profile"):
+        if not username:
+            st.warning("Please enter a username.")
+        elif not tokenizer or not text_model:
+            st.error("Text model not loaded.")
+        else:
+            with st.spinner(f"Fetching posts for {username}..."):
+                try:
+                    loader = load_session()  # cached, no re-login
+                    posts = get_instagram_posts(username, loader, max_posts=30)
+                except Exception as e:
+                    st.error(f"Session error: {e}")
+                    posts = []
+
+            if not posts:
+                st.info("No posts found or profile is private.")
+            else:
+                st.write(f"Fetched {len(posts)} recent posts.")
+
+                toxic_count = 0
+                results = []
+
+                for post in posts:
+                    text_content = post.get("text", "")
+                    image = post.get("image")  # already a PIL.Image or None
+
+                    # text analysis
+                    cleaned = clean_text(text_content)
+                    pred, _ = predict_toxicity(cleaned)
+
+                    # image analysis
+                    img_pred = 0
+                    if image is not None and img_processor and img_model:
+                        try:
+                            img_pred, _ = predict_image(image)
+                        except Exception as e:
+                            print(f"Image analysis failed for {post['shortcode']}: {e}")
+
+                    is_toxic = int(pred == 1 or img_pred == 1)
+                    toxic_count += is_toxic
+
+                    results.append({
+                        "shortcode": post["shortcode"],
+                        "text": text_content,
+                        "text_toxic": pred,
+                        "image_toxic": img_pred,
+                        "toxic": is_toxic
+                    })
+
+                # overall verdict
+                toxicity_score = (toxic_count / len(results)) * 100
+                st.metric("Toxicity Score", f"{toxicity_score:.1f}%")
+
+                if toxicity_score > 50:
+                    st.error(
+                        f"⚠️ High Risk: {toxic_count}/{len(results)} posts flagged as toxic."
+                    )
+                elif toxicity_score > 0:
+                    st.warning(
+                        f"⚠️ Moderate Risk: {toxic_count}/{len(results)} posts flagged as toxic."
+                    )
+                else:
+                    st.success("✅ Safe Profile: No toxic content detected in recent posts.")
+
+                # expanded post view
+                with st.expander("View Analyzed Posts"):
+                    for r in results:
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            st.text(r["text"][:150] + "..." if len(r["text"]) > 150 else r["text"])
+                            st.caption(
+                                f"https://www.instagram.com/p/{r['shortcode']}/"
+                            )
+                        with col2:
+                            if r["toxic"]:
+                                st.error("Toxic")
+                            else:
+                                st.success("Safe")
+                        st.divider()
+
+    st.markdown("---")
+
+
+with tab3:
+    st.header("Analyze Text/Comments")
+    st.write(
+        "Paste your comments below to see whether you're being cyberbullied or not!!."
+    )
+
+    text_input = st.text_area("Input Text", height=150)
+
+    if st.button("Analyze Text"):
+        if not tokenizer or not text_model:
+            st.error(
+                "Model artifacts not found. Please train the model and download artifacts to models/bert_model."
+            )
+        elif text_input.strip() == "":
+            st.warning("Please enter some text.")
+        else:
+            # Preprocess
+            cleaned_text = clean_text(text_input)
+
+            # Predict
+            try:
+                prediction, probabilities = predict_toxicity(cleaned_text)
+
+                if prediction == 1:
+                    st.error("⚠️ Application Detected: **Cyberbullying**")
+                    st.write(f"Confidence: {probabilities[1] * 100:.2f}%")
+                else:
+                    st.success("✅ Application Detected: **Non-Cyberbullying**")
+                    st.write(f"Confidence: {probabilities[0] * 100:.2f}%")
+            except Exception as e:
+                st.error(f"Error during prediction: {e}")
+    
+    st.markdown("---")
+
 with tab4:
     st.header("Image Analyzer")
     st.markdown("""
     **How Scoring Works:**
     This tool analyzes both text and images.
-    - **Text Analysis**: Uses a fine-tuned DistilBERT model.
+    - **Text Analysis**: Uses OpenAI's CLIP model to extract text.
     - **Image Analysis**: Uses a Vision Transformer (ViT) model fine-tuned on hateful memes.
     - **Final Score**: A post is considered **Toxic** if *either* the text or the image is classified as toxic/hateful. The overall "Toxicity Score" is the percentage of analyzed posts that are flagged as toxic.
     """)
-    st.write(
-        "Upload an image to check for cyberbullying content (e.g., hate symbols, gore, or NSFW)."
-    )
+    st.write("Upload an image to check for cyberbullying content (e.g., hate symbols, gore, or NSFW).")
 
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
@@ -358,57 +378,51 @@ with tab4:
 
         if st.button("Analyze Image"):
             with st.spinner("Analyzing..."):
-                if not img_processor or not img_model:
-                    st.error("Image model not found or not loaded correctly.")
-                else:
-                    try:
-                        prediction, probabilities = predict_image(image)
+                try:
+                    # Convert image to base64 and send to backend
+                    buffered = BytesIO()
+                    image.save(buffered, format="JPEG")
+                    img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-                        # Get label from config, fallback to manual mapping if just "0"/"1"
-                        id2label = img_model.config.id2label
-                        raw_label = id2label[prediction]
+                    response = requests.post(
+                        "http://localhost:8001/api/analyze-image",
+                        json={"image": img_base64}
+                    )
+                    result = response.json()
 
-                        # Force mapping for Hateful Memes dataset (0=Safe, 1=Toxic)
-                        # The dataset usually labels 0 as "not_hateful" and 1 as "hateful"
-                        if str(raw_label) == "1" or str(raw_label).lower() == "hateful":
-                            display_label = "Toxic / Hateful Content"
-                            is_toxic = True
-                        else:
-                            display_label = "Safe / Non-Toxic"
-                            is_toxic = False
+                    is_harmful = result.get("is_harmful", False)
+                    confidence = result.get("confidence", 0)
+                    threat_level = result.get("threat_level", "low")
+                    analysis = result.get("analysis", "")
 
-                        confidence = probabilities.max().item()
+                    if is_harmful:
+                        st.error(f"⚠️ Application Detected: **Toxic / Harmful Content**")
+                    else:
+                        st.success(f"✅ Application Detected: **Safe / Non-Toxic**")
 
-                        if is_toxic:
-                            st.error(f"⚠️ Application Detected: **{display_label}**")
-                        else:
-                            st.success(f"✅ Application Detected: **{display_label}**")
+                    st.write(f"Confidence: {confidence:.2f}%")
+                    st.write(f"Threat Level: {threat_level.upper()}")
+                    st.write(analysis)
 
-                        st.write(f"Confidence: {confidence * 100:.2f}%")
+                    with st.expander("See label scores"):
+                        label_scores = result.get("label_scores", {})
+                        for label, score in label_scores.items():
+                            st.write(f"{label}: {score:.1f}%")
 
-                        with st.expander("See predictions"):
-                            # visualizes top N (min of 3 or num_classes)
-                            num_classes = len(probabilities)
-                            top_k = min(3, num_classes)
-                            top_prob, top_indices = torch.topk(probabilities, top_k)
+                except Exception as e:
+                    st.error(f"Error analyzing image: {e}")
 
-                            for prob, idx in zip(top_prob, top_indices):
-                                lbl = id2label[idx.item()]
-                                # Map for display
-                                if str(lbl) == "1":
-                                    lbl = "Toxic"
-                                if str(lbl) == "0":
-                                    lbl = "Safe"
-                                st.write(f"{lbl}: {prob.item() * 100:.2f}%")
-
-                    except Exception as e:
-                        st.error(f"Error analyzing image: {e}")
-
-st.markdown("---")
+    st.markdown("---")
 
 with tab5:
     st.header("Audio Analyzer (Toxic Speech Detection)")
-    st.write("Upload an audio file (mp3, wav, m4a) to detect toxic speech.")
+    st.markdown("""
+    **How Scoring Works:**
+    This tool transcripts audio to text using OpenAI's Whisper.
+    - **Audio Analysis**: Uses OpenAI's Whisper model to extract text.
+    - **Image Analysis**: Uses DistilBERT model which is fine-tuned on hateful text.
+    - **Final Score**: A audio is considered **Toxic** if the text is classified as toxic/hateful. The overall "Toxicity Score" is the percentage of analyzed audio that are flagged as toxic.
+    """)
 
     uploaded_audio = st.file_uploader(
         "Choose an audio file...", type=["mp3", "wav", "m4a", "ogg"]

@@ -11,3 +11,7 @@ venv/
 .DS_Store
 results/
 models/
+backend.log
+sessions/,
+eval_outputs/
+eval_outputs_*

@@ -1,4 +1,4 @@
-kimport torch
+import torch
 from datasets import load_dataset
 from transformers import ViTImageProcessor, ViTForImageClassification, TrainingArguments, Trainer
 from torchvision.transforms import (

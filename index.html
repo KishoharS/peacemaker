@@ -1,1265 +1,1592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peacemaker - Cyberbullying Detection System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #0071e3;
-            --secondary-color: #f5f5f7;
-            --text-dark: #1d1d1d;
-            --text-gray: #666;
-            --border-light: #e5e5e7;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: #ffffff;
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 0.5rem 2rem;
-            z-index: 1000;
-            border-bottom: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 44px;
-        }
-
-        .logo {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            text-decoration: none;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--text-dark);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 44px;
-            background: #ffffff;
-            position: relative;
-        }
-
-        .hero-content {
-            max-width: 900px;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.1;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-gray);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 12px 32px;
-            background: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .cta-button:hover {
-            background: #0077ed;
-        }
-
-        /* Section Styling */
-        section {
-            padding: 4rem 2rem;
-        }
-
-        .section-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            text-align: center;
-            margin-bottom: 3rem;
-            color: var(--text-dark);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        /* Features Section */
-        .features {
-            background: var(--secondary-color);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3rem;
-        }
-
-        .feature-card {
-            padding: 2rem;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.1);
-        }
-
-        .feature-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.8rem;
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        .feature-card p {
-            color: var(--text-gray);
-            line-height: 1.6;
-        }
-
-        /* Demo Section */
-        .demo-section {
-            background: white;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-light);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            padding: 12px 24px;
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -1px;
-        }
-
-        .tab-button:hover {
-            color: var(--text-dark);
-        }
-
-        .tab-button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .input-box {
-            background: var(--secondary-color);
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-        }
-
-        .input-box h4 {
-            color: var(--text-dark);
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            background: white;
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-            color: var(--text-dark);
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
-        }
-
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-upload input[type="file"] {
-            display: none;
-        }
-
-        .file-upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            padding: 2rem;
-            background: white;
-            border: 2px dashed var(--border-light);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-gray);
-            font-weight: 500;
-        }
-
-        .file-upload-label:hover {
-            border-color: var(--primary-color);
-            background: #f5f5f7;
-        }
-
-        .submit-button {
-            width: 100%;
-            padding: 12px 24px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .submit-button:hover {
-            background: #0077ed;
-        }
-
-        .submit-button:active {
-            transform: scale(0.98);
-        }
-
-        .results-box {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            margin-top: 2rem;
-            display: none;
-        }
-
-        .results-box.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 1rem;
-            background: var(--secondary-color);
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            align-items: center;
-        }
-
-        .result-label {
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .result-value {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .threat-badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .threat-high {
-            background: #fcd3d3;
-            color: #d00;
-        }
-
-        .threat-medium {
-            background: #ffeaa7;
-            color: #ff9800;
-        }
-
-        .threat-low {
-            background: #dff0d8;
-            color: #078;
-        }
-
-        /* Technical Section */
-        .technical-section {
-            background: var(--secondary-color);
-        }
-
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .tech-box {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-        }
-
-        .tech-box h4 {
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .tech-box ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .tech-box li {
-            padding: 0.5rem 0;
-            color: var(--text-gray);
-            display: flex;
-            align-items: center;
-        }
-
-        .tech-box li:before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            margin-right: 0.8rem;
-            flex-shrink: 0;
-        }
-
-        .architecture {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            margin-top: 2rem;
-        }
-
-        .architecture h4 {
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .flow-diagram {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .flow-item {
-            background: var(--secondary-color);
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            color: var(--text-dark);
-            border: 1px solid var(--border-light);
-            flex: 1;
-            min-width: 100px;
-        }
-
-        .flow-arrow {
-            color: var(--primary-color);
-            font-size: 1.2rem;
-            margin: 0 0.5rem;
-        }
-
-        /* Team Section */
-        .team-section {
-            background: white;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .team-card {
-            background: var(--secondary-color);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s ease;
-        }
-
-        .team-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 10px 30px rgba(0, 113, 227, 0.1);
-        }
-
-        .team-image {
-            width: 100%;
-            height: 250px;
-            background: #e5e5e7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .team-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .team-info {
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .team-info h3 {
-            font-size: 1.2rem;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .team-role {
-            color: var(--primary-color);
-            font-weight: 500;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .team-bio {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--secondary-color);
-            padding: 3rem 2rem;
-            border-top: 1px solid var(--border-light);
-            margin-top: 4rem;
-        }
-
-        footer p {
-            color: var(--text-gray);
-            text-align: center;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero p {
-                font-size: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                font-size: 0.85rem;
-            }
-
-            .team-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .input-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .flow-diagram {
-                flex-direction: column;
-            }
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid #e5e5e7;
-            border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peacemaker — Cyberbullying Detection System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f4ef;
+    --warm-white: #faf9f7;
+    --dove: #e8e4dd;
+    --stone: #c4bdb3;
+    --charcoal: #2a2825;
+    --ink: #1a1816;
+    --muted: #7a746c;
+    --accent: #4a7c6f;
+    --accent-light: #6a9e90;
+    --danger: #c0392b;
+    --gold: #b8956a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--charcoal);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(250,249,247,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(196,189,179,0.3);
+    animation: fadeDown 0.8s ease both;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    display: flex; align-items: center; gap: 0.6rem;
+    text-decoration: none;
+  }
+  .nav-logo svg { width: 28px; height: 28px; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--charcoal); }
+  .nav-cta {
+    background: var(--accent);
+    color: white !important;
+    padding: 0.5rem 1.4rem;
+    border-radius: 100px;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--accent-light) !important; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(74,124,111,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(184,149,106,0.06) 0%, transparent 50%),
+      var(--warm-white);
+  }
+
+  /* Animated pigeon SVG */
+  .pigeon-hero {
+    position: relative; z-index: 1;
+    margin-bottom: 3rem;
+    animation: float 6s ease-in-out infinite;
+  }
+  .pigeon-hero svg {
+    width: 180px; height: 180px;
+    filter: drop-shadow(0 20px 40px rgba(74,124,111,0.15));
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-12px) rotate(1deg); }
+    66% { transform: translateY(-6px) rotate(-0.5deg); }
+  }
+
+  /* Wing flutter */
+  .wing-left, .wing-right {
+    animation: wingFlutter 3s ease-in-out infinite;
+    transform-origin: center;
+  }
+  .wing-right { animation-delay: 0.15s; }
+  @keyframes wingFlutter {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.85); }
+  }
+
+  .hero-eyebrow {
+    position: relative; z-index: 1;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1.2rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-title {
+    position: relative; z-index: 1;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    position: relative; z-index: 1;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 520px;
+    font-weight: 300;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .hero-actions {
+    position: relative; z-index: 1;
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 0.9rem 2.2rem;
+    border-radius: 100px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(74,124,111,0.3);
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(74,124,111,0.35); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--charcoal);
+    padding: 0.9rem 2.2rem;
+    border-radius: 100px;
+    font-size: 0.88rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border: 1px solid var(--stone);
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--charcoal); transform: translateY(-2px); }
+
+  .scroll-indicator {
+    position: absolute; bottom: 2.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    color: var(--stone);
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--stone), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.4; transform: scaleY(0.7); }
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    width: 60px; height: 1px;
+    background: var(--stone);
+    margin: 0 auto 2rem;
+  }
+
+  /* ── ABOUT STRIP ── */
+  .about-strip {
+    background: var(--cream);
+    padding: 6rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  .about-text .label {
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500; margin-bottom: 1rem;
+  }
+  .about-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .about-text p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  .about-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  }
+  .stat-card {
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(42,40,37,0.08); }
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 8rem 4rem;
+    text-align: center;
+  }
+  .section-header { margin-bottom: 5rem; }
+  .section-header .label {
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500; margin-bottom: 1rem;
+  }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .section-header p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: var(--cream);
+    border: 1px solid var(--dove);
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-align: left;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(42,40,37,0.1); }
+  .feature-icon {
+    width: 52px; height: 52px;
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+  .feature-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+  }
+  .feature-card p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .feature-tag {
+    display: inline-block;
+    margin-top: 1.2rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(74,124,111,0.1);
+    color: var(--accent);
+    border-radius: 100px;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* ── ARCHITECTURE ── */
+  .architecture {
+    background: var(--ink);
+    padding: 8rem 4rem;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .architecture::before {
+    content: '🕊';
+    position: absolute;
+    font-size: 30rem;
+    opacity: 0.02;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .architecture .section-header .label { color: var(--accent-light); }
+  .architecture .section-header h2 { color: white; }
+  .architecture .section-header p { color: rgba(255,255,255,0.5); }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+  }
+  .pipeline-node {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1.5rem 1.8rem;
+    text-align: center;
+    min-width: 130px;
+    transition: background 0.3s, transform 0.3s;
+  }
+  .pipeline-node:hover {
+    background: rgba(74,124,111,0.2);
+    transform: translateY(-4px);
+    border-color: var(--accent-light);
+  }
+  .pipeline-node .node-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .pipeline-node .node-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.05em;
+  }
+  .pipeline-node .node-model {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: white;
+    margin-top: 0.3rem;
+  }
+  .pipeline-arrow {
+    color: rgba(255,255,255,0.2);
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+  .pipeline-fusion {
+    background: linear-gradient(135deg, rgba(74,124,111,0.3), rgba(184,149,106,0.2));
+    border-color: var(--accent-light);
+    border-width: 2px;
+  }
+
+  /* ── PLATFORMS ── */
+  .platforms {
+    padding: 8rem 4rem;
+    background: var(--cream);
+  }
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .platform-card {
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .platform-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(42,40,37,0.08); }
+  .platform-icon {
+    width: 56px; height: 56px; flex-shrink: 0;
+    background: var(--cream);
+    border: 1px solid var(--dove);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+  }
+  .platform-info h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .platform-info p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+  .platform-status {
+    margin-top: 0.5rem;
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+  .status-live { background: rgba(74,124,111,0.12); color: var(--accent); }
+  .status-beta { background: rgba(184,149,106,0.12); color: var(--gold); }
+
+  /* ── TRY IT ── */
+  .demo-section { padding: 8rem 4rem; text-align: center; }
+
+  .tryit-container {
+    max-width: 820px;
+    margin: 3rem auto 0;
+    background: var(--cream);
+    border: 1px solid var(--dove);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(42,40,37,0.08);
+  }
+
+  .tryit-tabs {
+    display: flex;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--dove);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tryit-tabs::-webkit-scrollbar { display: none; }
+
+  .tryit-tab {
+    flex: 1; min-width: 120px;
+    padding: 1rem 0.5rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .tryit-tab:hover { color: var(--charcoal); background: var(--cream); }
+  .tryit-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 500;
+    background: var(--cream);
+  }
+
+  .tryit-panel { display: none; padding: 2.5rem; text-align: left; }
+  .tryit-panel.active { display: block; }
+
+  .tryit-desc {
+    display: flex; gap: 1.2rem; align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 16px;
+  }
+  .tryit-desc-icon { font-size: 2rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .tryit-desc h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+  .tryit-desc p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .tryit-form textarea,
+  .tryit-form input[type="text"] {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--charcoal);
+    resize: vertical;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+  .tryit-form textarea:focus,
+  .tryit-form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .tryit-form textarea::placeholder,
+  .tryit-form input::placeholder { color: var(--stone); }
+
+  .tryit-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 0.85rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 16px rgba(74,124,111,0.25);
+    margin-bottom: 1.2rem;
+  }
+  .tryit-btn:hover { background: var(--accent-light); transform: translateY(-2px); }
+  .tryit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-icon { font-size: 1rem; }
+
+  .file-drop-zone {
+    border: 2px dashed var(--stone);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-bottom: 1rem;
+    background: var(--warm-white);
+  }
+  .file-drop-zone:hover { border-color: var(--accent); background: rgba(74,124,111,0.03); }
+  .drop-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+  .drop-label { font-size: 0.9rem; color: var(--charcoal); font-weight: 500; margin-bottom: 0.3rem; }
+  .drop-hint { font-size: 0.78rem; color: var(--stone); }
+
+  .input-row {
+    display: flex; gap: 1rem; align-items: flex-end;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .input-with-prefix {
+    flex: 1; min-width: 200px;
+    display: flex; align-items: center;
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .input-with-prefix:focus-within { border-color: var(--accent); }
+  .input-prefix {
+    padding: 0 0.8rem;
+    color: var(--stone);
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--cream);
+    border-right: 1px solid var(--dove);
+    height: 100%;
+    display: flex; align-items: center;
+    padding-top: 0.9rem; padding-bottom: 0.9rem;
+  }
+  .input-with-prefix input {
+    border: none !important;
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding-left: 0.8rem !important;
+  }
+  .input-count-wrap {
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .input-count-wrap label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .input-count-wrap input[type="number"] {
+    width: 100px;
+    padding: 0.75rem 1rem !important;
+    margin-bottom: 0 !important;
+    text-align: center;
+  }
+
+  /* Results */
+  .tryit-result { display: none; }
+  .result-card {
+    border-radius: 14px;
+    padding: 1.4rem 1.6rem;
+    margin-top: 0.5rem;
+  }
+  .result-card.toxic {
+    background: rgba(192,57,43,0.07);
+    border: 1px solid rgba(192,57,43,0.2);
+  }
+  .result-card.safe {
+    background: rgba(74,124,111,0.07);
+    border: 1px solid rgba(74,124,111,0.2);
+  }
+  .result-card.loading {
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .result-verdict {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .result-verdict.toxic { color: var(--danger); }
+  .result-verdict.safe { color: var(--accent); }
+  .result-meta {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .result-bar-wrap { margin-top: 0.8rem; }
+  .result-bar-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    display: flex; justify-content: space-between;
+  }
+  .result-bar {
+    height: 5px;
+    background: var(--dove);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .result-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+  .result-bar-fill.toxic { background: var(--danger); }
+  .result-bar-fill.safe { background: var(--accent); }
+
+  .result-posts {
+    margin-top: 1rem;
+    display: flex; flex-direction: column; gap: 0.6rem;
+    max-height: 200px; overflow-y: auto;
+  }
+  .result-post-item {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    color: var(--muted);
+    display: flex; gap: 0.6rem; align-items: flex-start;
+  }
+  .post-badge { flex-shrink: 0; font-size: 0.7rem; }
+
+  /* ── TEAM ── */
+  .team {
+    padding: 8rem 4rem;
+    background: var(--cream);
+    text-align: center;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 4rem auto 0;
+  }
+  .team-card {
+    background: var(--warm-white);
+    border: 1px solid var(--dove);
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .team-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(42,40,37,0.1); }
+  .team-photo {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 1.2rem;
+    overflow: hidden;
+    border: 3px solid var(--dove);
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    color: var(--stone);
+    transition: border-color 0.3s;
+  }
+  .team-card:hover .team-photo { border-color: var(--accent-light); }
+  .team-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .team-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .team-role {
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 0.8rem;
+  }
+  .team-bio {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .team-links {
+    display: flex; justify-content: center; gap: 0.8rem;
+    margin-top: 1.2rem;
+  }
+  .team-link {
+    width: 32px; height: 32px;
+    background: var(--cream);
+    border: 1px solid var(--dove);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .team-link:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  .team-note {
+    margin-top: 3rem;
+    padding: 1.5rem 2rem;
+    background: var(--warm-white);
+    border: 1px dashed var(--stone);
+    border-radius: 12px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin-left: auto; margin-right: auto;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.4);
+    padding: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: rgba(255,255,255,0.8);
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .footer-links {
+    display: flex; gap: 2rem; list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.3);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .footer-links a:hover { color: rgba(255,255,255,0.8); }
+  .footer-copy { font-size: 0.78rem; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    .nav-links { display: none; }
+    .about-strip { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 2rem; }
+    .features { padding: 5rem 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .architecture { padding: 5rem 2rem; }
+    .pipeline { flex-direction: column; }
+    .pipeline-arrow { transform: rotate(90deg); }
+    .platforms { padding: 5rem 2rem; }
+    .platforms-grid { grid-template-columns: 1fr; }
+    .demo-section { padding: 5rem 2rem; }
+    .tryit-tabs { flex-wrap: nowrap; overflow-x: auto; }
+    .tryit-tab { min-width: 90px; font-size: 0.75rem; }
+    .tryit-panel { padding: 1.5rem; }
+    .tryit-desc { flex-direction: column; gap: 0.8rem; }
+    .input-row { flex-direction: column; }
+    .input-count-wrap input[type="number"] { width: 100%; }
+    .team { padding: 5rem 2rem; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    footer { flex-direction: column; text-align: center; padding: 3rem 2rem; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <a href="#home" class="logo">Peacemaker</a>
-        <ul class="nav-links">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#demo">Demo</a></li>
-            <li><a href="#technical">Technical</a></li>
-            <li><a href="#team">Team</a></li>
-        </ul>
-    </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Detect and Prevent Cyberbullying</h1>
-            <p>Peacemaker uses advanced machine learning to detect cyberbullying across text, images, and audio—providing real-time protection for online communities.</p>
-            <a href="#demo" class="cta-button">Try Now</a>
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="50" cy="58" rx="22" ry="16" fill="#4a7c6f" opacity="0.9"/>
+      <ellipse cx="50" cy="52" rx="14" ry="12" fill="#4a7c6f"/>
+      <circle cx="57" cy="47" r="7" fill="#5a9080"/>
+      <circle cx="59" cy="46" r="2.5" fill="#1a1816"/>
+      <circle cx="60" cy="45.5" r="0.8" fill="white"/>
+      <path d="M62 48 L68 47 L64 50Z" fill="#b8956a"/>
+      <path class="wing-left" d="M36 54 C22 40 18 30 28 28 C35 27 42 38 44 50Z" fill="#6a9e90" opacity="0.8"/>
+      <path class="wing-right" d="M64 54 C78 40 82 30 72 28 C65 27 58 38 56 50Z" fill="#6a9e90" opacity="0.8"/>
+      <path d="M44 72 L50 68 L56 72 L54 78 L50 76 L46 78Z" fill="#5a9080"/>
+    </svg>
+    Peacemaker
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#architecture">How It Works</a></li>
+    <li><a href="#platforms">Platforms</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#demo" class="nav-cta">Live Demo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="pigeon-hero">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Body -->
+      <ellipse cx="100" cy="118" rx="42" ry="30" fill="#4a7c6f" opacity="0.95"/>
+      <ellipse cx="100" cy="106" rx="28" ry="24" fill="#4a7c6f"/>
+      <!-- Head -->
+      <circle cx="116" cy="90" r="18" fill="#5a9080"/>
+      <!-- Eye -->
+      <circle cx="121" cy="86" r="5" fill="#1a1816"/>
+      <circle cx="122.5" cy="85" r="1.5" fill="white"/>
+      <!-- Beak -->
+      <path d="M128 90 L140 88 L130 94Z" fill="#b8956a"/>
+      <!-- Wing left -->
+      <path class="wing-left" d="M72 110 C48 88 40 68 56 62 C68 58 80 76 84 102Z" fill="#6a9e90" opacity="0.85"/>
+      <!-- Wing right -->
+      <path class="wing-right" d="M128 110 C152 88 160 68 144 62 C132 58 120 76 116 102Z" fill="#6a9e90" opacity="0.85"/>
+      <!-- Tail -->
+      <path d="M80 146 L100 136 L120 146 L114 158 L100 152 L86 158Z" fill="#5a9080"/>
+      <!-- Olive branch -->
+      <path d="M60 130 Q50 140 40 135" stroke="#b8956a" stroke-width="2" fill="none"/>
+      <ellipse cx="48" cy="136" rx="5" ry="3" fill="#6a9e90" transform="rotate(-20 48 136)"/>
+      <ellipse cx="42" cy="133" rx="4" ry="2.5" fill="#6a9e90" transform="rotate(10 42 133)"/>
+      <ellipse cx="55" cy="138" rx="4" ry="2.5" fill="#6a9e90" transform="rotate(-30 55 138)"/>
+    </svg>
+  </div>
+
+  <p class="hero-eyebrow">B.Tech Final Year Project · AI & Data Science</p>
+  <h1 class="hero-title">Peace in the<br><em>Digital World</em></h1>
+  <p class="hero-sub">A multimodal AI system that detects cyberbullying across text, images, audio, and social media — powered by DistilBERT, ViT, Whisper, and CLIP.</p>
+
+  <div class="hero-actions">
+    <a href="#demo" class="btn-primary">See It In Action</a>
+    <a href="#architecture" class="btn-secondary">How It Works →</a>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-strip" id="about">
+  <div class="about-text reveal">
+    <p class="label">About the Project</p>
+    <h2>Built to protect people<br>from online harm</h2>
+    <p>Peacemaker is a final-year B.Tech project that uses state-of-the-art deep learning models to identify cyberbullying and hate speech across multiple input modalities. From a typed comment to an uploaded meme to a voice recording — Peacemaker analyses it all and returns a verdict within seconds.</p>
+  </div>
+  <div class="about-stats reveal reveal-delay-2">
+    <div class="stat-card">
+      <div class="stat-number">5</div>
+      <div class="stat-label">Input Modalities<br>Text, Image, Audio, Instagram, Telegram</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">4</div>
+      <div class="stat-label">AI Models<br>DistilBERT · ViT · Whisper · CLIP</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Social Platforms<br>Instagram · Telegram</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">99%</div>
+      <div class="stat-label">CLIP Accuracy<br>on Threatening Image Test</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-header reveal">
+    <p class="label">Core Capabilities</p>
+    <div class="section-divider"></div>
+    <h2>Five ways to detect harm</h2>
+    <p>Each modality runs through a dedicated model pipeline, with results fused into a single toxicity verdict.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-icon">💬</div>
+      <h3>Text Analysis</h3>
+      <p>Fine-tuned DistilBERT model classifies raw text, comments, and captions for cyberbullying patterns with high confidence.</p>
+      <span class="feature-tag">DistilBERT</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-icon">🖼️</div>
+      <h3>Image Analysis</h3>
+      <p>CLIP's zero-shot vision-language model identifies violent, threatening, or hateful imagery — even when overlaid with text.</p>
+      <span class="feature-tag">CLIP · ViT</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-3">
+      <div class="feature-icon">🎙️</div>
+      <h3>Audio Analysis</h3>
+      <p>OpenAI Whisper transcribes spoken audio to text, which is then passed through the DistilBERT classifier for toxic speech detection.</p>
+      <span class="feature-tag">Whisper</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-icon">📸</div>
+      <h3>Instagram Scanner</h3>
+      <p>Enter any public Instagram username and Peacemaker fetches and analyses their recent posts and captions for toxic content patterns.</p>
+      <span class="feature-tag">Instaloader</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2">
+      <div class="feature-icon">✈️</div>
+      <h3>Telegram Scanner</h3>
+      <p>Analyse public Telegram channels for hate speech and bullying across both text messages and shared images.</p>
+      <span class="feature-tag">Telethon</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-3">
+      <div class="feature-icon">⚡</div>
+      <h3>Real-time Results</h3>
+      <p>Flask REST API backend delivers predictions in real time with confidence scores and threat level indicators.</p>
+      <span class="feature-tag">Flask · REST API</span>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="architecture" id="architecture">
+  <div class="section-header reveal">
+    <p class="label">Model Pipeline</p>
+    <div class="section-divider" style="background: rgba(255,255,255,0.15)"></div>
+    <h2>How Peacemaker thinks</h2>
+    <p>Each input type flows through a dedicated model. A fusion layer combines signals for the final verdict.</p>
+  </div>
+
+  <div class="pipeline reveal">
+    <div class="pipeline-node">
+      <div class="node-icon">💬</div>
+      <div class="node-label">Text Input</div>
+      <div class="node-model">DistilBERT</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node">
+      <div class="node-icon">🖼️</div>
+      <div class="node-label">Image Input</div>
+      <div class="node-model">CLIP + ViT</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node">
+      <div class="node-icon">🎙️</div>
+      <div class="node-label">Audio Input</div>
+      <div class="node-model">Whisper</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node pipeline-fusion">
+      <div class="node-icon">🧠</div>
+      <div class="node-label">Fusion Layer</div>
+      <div class="node-model">Final Verdict</div>
+    </div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-node">
+      <div class="node-icon">🕊️</div>
+      <div class="node-label">Output</div>
+      <div class="node-model">Safe / Toxic</div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section class="platforms" id="platforms">
+  <div class="section-header reveal">
+    <p class="label">Platform Coverage</p>
+    <div class="section-divider"></div>
+    <h2>Monitors where it matters</h2>
+    <p>Peacemaker connects to social platforms where cyberbullying most commonly occurs.</p>
+  </div>
+
+  <div class="platforms-grid">
+    <div class="platform-card reveal reveal-delay-1">
+      <div class="platform-icon">📸</div>
+      <div class="platform-info">
+        <h4>Instagram</h4>
+        <p>Analyses public profile posts, captions, and engagement metrics for toxic content patterns.</p>
+        <span class="platform-status status-live">● Live</span>
+      </div>
+    </div>
+    <div class="platform-card reveal reveal-delay-2">
+      <div class="platform-icon">✈️</div>
+      <div class="platform-info">
+        <h4>Telegram</h4>
+        <p>Scrapes public channel messages including text and images via the Telethon API client.</p>
+        <span class="platform-status status-live">● Live</span>
+      </div>
+    </div>
+    <div class="platform-card reveal reveal-delay-3">
+      <div class="platform-icon">🐦</div>
+      <div class="platform-info">
+        <h4>Twitter / X</h4>
+        <p>Integration planned. API tier restrictions currently limit real-time data access.</p>
+        <span class="platform-status status-beta">◎ Planned</span>
+      </div>
+    </div>
+    <div class="platform-card reveal reveal-delay-4">
+      <div class="platform-icon">👽</div>
+      <div class="platform-info">
+        <h4>Reddit</h4>
+        <p>PRAW-based subreddit and user profile scanner for community-level toxicity monitoring.</p>
+        <span class="platform-status status-beta">◎ In Progress</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRY IT -->
+<section class="demo-section" id="demo">
+  <div class="section-header reveal">
+    <p class="label">Try It Yourself</p>
+    <div class="section-divider"></div>
+    <h2>See Peacemaker in action</h2>
+    <p>Pick any of the five ways to check for cyberbullying and harmful content below.</p>
+  </div>
+
+  <div class="tryit-container reveal">
+
+    <!-- TAB BUTTONS -->
+    <div class="tryit-tabs">
+      <button class="tryit-tab active" onclick="switchTab('text', this)">💬 Text</button>
+      <button class="tryit-tab" onclick="switchTab('image', this)">🖼️ Image</button>
+      <button class="tryit-tab" onclick="switchTab('audio', this)">🎙️ Audio</button>
+      <button class="tryit-tab" onclick="switchTab('instagram', this)">📸 Instagram</button>
+      <button class="tryit-tab" onclick="switchTab('telegram', this)">✈️ Telegram</button>
+    </div>
+
+    <!-- TEXT TAB -->
+    <div class="tryit-panel active" id="tab-text">
+      <div class="tryit-desc">
+        <div class="tryit-desc-icon">💬</div>
+        <div>
+          <h3>Text Analyzer</h3>
+          <p>Think someone sent you a hurtful message? Paste it here and Peacemaker will tell you if it counts as cyberbullying. It works on comments, captions, DMs — anything written.</p>
         </div>
-    </section>
+      </div>
+      <div class="tryit-form">
+        <textarea id="text-input" placeholder="Paste any text here — a comment, caption, message, or anything you've received online..." rows="5"></textarea>
+        <button class="tryit-btn" onclick="analyzeText()">
+          <span class="btn-icon">🔍</span> Analyze Text
+        </button>
+        <div class="tryit-result" id="text-result"></div>
+      </div>
+    </div>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="section-container">
-            <h2 class="section-title">Capabilities</h2>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <h3>Text Analysis</h3>
-                    <p>Advanced NLP using DistilBERT to detect cyberbullying patterns in written content across social platforms.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Image Detection</h3>
-                    <p>Vision Transformer technology to identify inappropriate or harmful visual content with high accuracy.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Audio Analysis</h3>
-                    <p>Whisper AI integration for real-time transcription and analysis of speech-based harassment.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Social Media Integration</h3>
-                    <p>Direct monitoring of Instagram and Telegram for seamless threat detection and alerts.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Real-time Processing</h3>
-                    <p>Lightning-fast analysis with minimal latency for immediate threat response and intervention.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>Detailed Reports</h3>
-                    <p>Comprehensive analytics dashboard for tracking trends and understanding behavioral patterns.</p>
-                </div>
-            </div>
+    <!-- IMAGE TAB -->
+    <div class="tryit-panel" id="tab-image">
+      <div class="tryit-desc">
+        <div class="tryit-desc-icon">🖼️</div>
+        <div>
+          <h3>Image Analyzer</h3>
+          <p>Received a scary meme, a threatening photo, or an image with hateful text on it? Upload it here. Peacemaker uses a powerful vision AI (CLIP) to understand what the image actually means — not just what it looks like.</p>
         </div>
-    </section>
-
-    <!-- Demo Section -->
-    <section id="demo" class="demo-section">
-        <div class="section-container">
-            <h2 class="section-title">Test the System</h2>
-            <p style="text-align: center; color: var(--text-gray); margin-bottom: 2rem; font-size: 1rem;">
-                Try our detection models in real-time. Input your content and receive instant results.
-            </p>
-
-            <!-- Tabs Navigation -->
-            <div class="tabs">
-                <button class="tab-button active" data-tab="text">Text Analysis</button>
-                <button class="tab-button" data-tab="image">Image Detection</button>
-                <button class="tab-button" data-tab="audio">Audio Analysis</button>
-                <button class="tab-button" data-tab="social">Social Media</button>
-            </div>
-
-            <!-- Text Analysis Tab -->
-            <div id="text" class="tab-content active">
-                <div class="input-grid">
-                    <div class="input-box">
-                        <h4>Analyze Text</h4>
-                        <div class="form-group">
-                            <label>Enter text to analyze</label>
-                            <textarea id="textInput" placeholder="Paste or type content to analyze..."></textarea>
-                        </div>
-                        <button class="submit-button" onclick="analyzeText()">Analyze</button>
-                    </div>
-
-                    <div class="input-box">
-                        <h4>Results</h4>
-                        <div id="textResults" class="results-box">
-                            <div class="result-item">
-                                <span class="result-label">Detection</span>
-                                <span id="textThreat"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Confidence</span>
-                                <span id="textConfidencePercent"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
-                                <span style="color: var(--text-gray);" id="textAnalysis"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Image Detection Tab -->
-            <div id="image" class="tab-content">
-                <div class="input-grid">
-                    <div class="input-box">
-                        <h4>Upload Image</h4>
-                        <div class="form-group">
-                            <div class="file-upload">
-                                <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
-                                <label for="imageInput" class="file-upload-label">
-                                    <span>Click to upload or drag image</span>
-                                </label>
-                            </div>
-                            <div id="imagePreview" style="margin-top: 1rem; display: none;">
-                                <img id="previewImg" style="max-width: 100%; border-radius: 8px; max-height: 300px;">
-                            </div>
-                        </div>
-                        <button class="submit-button" onclick="analyzeImage()">Analyze Image</button>
-                    </div>
-
-                    <div class="input-box">
-                        <h4>Results</h4>
-                        <div id="imageResults" class="results-box">
-                            <div class="result-item">
-                                <span class="result-label">Status</span>
-                                <span id="imageThreat"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Confidence</span>
-                                <span id="imageConfidencePercent"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
-                                <span style="color: var(--text-gray);" id="imageAnalysis"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Audio Analysis Tab -->
-            <div id="audio" class="tab-content">
-                <div class="input-grid">
-                    <div class="input-box">
-                        <h4>Upload Audio</h4>
-                        <div class="form-group">
-                            <div class="file-upload">
-                                <input type="file" id="audioInput" accept="audio/*" onchange="previewAudio()">
-                                <label for="audioInput" class="file-upload-label">
-                                    <span>Click to upload or drag audio file</span>
-                                </label>
-                            </div>
-                            <div id="audioPreview" style="margin-top: 1rem; display: none;">
-                                <audio id="previewAudio" controls style="width: 100%; border-radius: 8px;"></audio>
-                            </div>
-                        </div>
-                        <button class="submit-button" onclick="analyzeAudio()">Analyze Audio</button>
-                    </div>
-
-                    <div class="input-box">
-                        <h4>Results</h4>
-                        <div id="audioResults" class="results-box">
-                            <div class="result-item">
-                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Transcription</span>
-                                <span style="color: var(--text-gray);" id="audioTranscript"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Threat Detected</span>
-                                <span id="audioThreat"></span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Confidence</span>
-                                <span id="audioConfidencePercent"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Social Media Tab -->
-            <div id="social" class="tab-content">
-                <div class="input-box" style="max-width: 800px; margin: 0 auto;">
-                    <h4>Analyze Social Media Account</h4>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                        <div class="form-group">
-                            <label>Select Platform</label>
-                            <select id="socialPlatform" style="width: 100%; padding: 10px 12px; background: white; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-dark); font-size: 0.95rem;">
-                                <option value="">Choose platform...</option>
-                                <option value="instagram">Instagram</option>
-                                <option value="telegram">Telegram</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" id="socialUsername" placeholder="@username or handle">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Number of Posts to Analyze</label>
-                        <input type="number" id="postsCount" value="10" min="1" max="100" style="width: 100%; padding: 10px 12px; background: white; border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-dark); font-size: 0.95rem;">
-                    </div>
-
-                    <button class="submit-button" onclick="analyzeSocialMedia()">Scan Account</button>
-
-                    <div id="socialResults" class="results-box">
-                        <div class="result-item">
-                            <span class="result-label">Posts Analyzed</span>
-                            <span id="postsAnalyzed">0</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Bullying Detected</span>
-                            <span id="bullyingDetected">0</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Risk Level</span>
-                            <span id="riskLevel"></span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Recommendation</span>
-                            <span style="color: var(--text-gray);" id="recommendation"></span>
-                        </div>
-                        <div id="threatsList" style="margin-top: 1.5rem;"></div>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="tryit-form">
+        <div class="file-drop-zone" id="image-drop" onclick="document.getElementById('image-file').click()">
+          <div class="drop-icon">🖼️</div>
+          <div class="drop-label">Click to upload an image</div>
+          <div class="drop-hint">JPG, PNG, JPEG supported</div>
+          <input type="file" id="image-file" accept=".jpg,.jpeg,.png" style="display:none" onchange="previewImage(this)">
         </div>
-    </section>
-
-    <!-- Technical Section -->
-    <section id="technical" class="technical-section">
-        <div class="section-container">
-            <h2 class="section-title">Technical Architecture</h2>
-            
-            <div class="tech-grid">
-                <div class="tech-box">
-                    <h4>Machine Learning Models</h4>
-                    <ul>
-                        <li>DistilBERT for text classification</li>
-                        <li>Vision Transformer for image analysis</li>
-                        <li>Whisper for audio transcription</li>
-                        <li>Advanced preprocessing pipelines</li>
-                    </ul>
-                </div>
-
-                <div class="tech-box">
-                    <h4>Technology Stack</h4>
-                    <ul>
-                        <li>Python with PyTorch</li>
-                        <li>Transformers library</li>
-                        <li>FastAPI backend</li>
-                        <li>scikit-learn for utilities</li>
-                    </ul>
-                </div>
-
-                <div class="tech-box">
-                    <h4>Integration APIs</h4>
-                    <ul>
-                        <li>Instagram social graph</li>
-                        <li>Telegram messaging APIs</li>
-                        <li>EasyOCR for text extraction</li>
-                        <li>Real-time message streaming</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="architecture">
-                <h4>Processing Pipeline</h4>
-                <div class="flow-diagram">
-                    <div class="flow-item">Input</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-item">Preprocessing</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-item">Model</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-item">Classification</div>
-                    <div class="flow-arrow">→</div>
-                    <div class="flow-item">Report</div>
-                </div>
-            </div>
-
-            <div class="architecture">
-                <h4>Model Details</h4>
-                <p style="color: var(--text-gray); line-height: 1.8;">
-                    <strong>DistilBERT:</strong> A lightweight transformer model trained for binary classification of cyberbullying content. Processes up to 512 tokens per input with confidence scoring.<br><br>
-                    <strong>Vision Transformer:</strong> Segments images into patches and processes through transformer layers to detect harmful visual content with high precision.<br><br>
-                    <strong>Whisper:</strong> OpenAI's multilingual speech recognition model for transcribing and analyzing audio content in real-time.
-                </p>
-            </div>
+        <div id="image-preview-wrap" style="display:none">
+          <img id="image-preview" src="" alt="Preview" style="max-width:100%; max-height:220px; border-radius:12px; margin-top:1rem; object-fit:contain;">
         </div>
-    </section>
+        <button class="tryit-btn" onclick="analyzeImage()">
+          <span class="btn-icon">🔍</span> Analyze Image
+        </button>
+        <div class="tryit-result" id="image-result"></div>
+      </div>
+    </div>
 
-    <!-- Team Section -->
-    <section id="team" class="team-section">
-        <div class="section-container">
-            <h2 class="section-title">Our Team</h2>
-            
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" alt="Team Member">
-                    </div>
-                    <div class="team-info">
-                        <h3>Member Name</h3>
-                        <div class="team-role">Lead Engineer</div>
-                        <p class="team-bio">Specializes in machine learning architecture and model optimization.</p>
-                    </div>
-                </div>
-
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="Team Member">
-                    </div>
-                    <div class="team-info">
-                        <h3>Member Name</h3>
-                        <div class="team-role">Data Scientist</div>
-                        <p class="team-bio">Focuses on data analysis, training, and model evaluation.</p>
-                    </div>
-                </div>
-
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" alt="Team Member">
-                    </div>
-                    <div class="team-info">
-                        <h3>Member Name</h3>
-                        <div class="team-role">Full Stack Developer</div>
-                        <p class="team-bio">Builds the web application and user interfaces.</p>
-                    </div>
-                </div>
-
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="Team Member">
-                    </div>
-                    <div class="team-info">
-                        <h3>Member Name</h3>
-                        <div class="team-role">DevOps Engineer</div>
-                        <p class="team-bio">Manages deployment and system infrastructure.</p>
-                    </div>
-                </div>
-            </div>
+    <!-- AUDIO TAB -->
+    <div class="tryit-panel" id="tab-audio">
+      <div class="tryit-desc">
+        <div class="tryit-desc-icon">🎙️</div>
+        <div>
+          <h3>Audio Analyzer</h3>
+          <p>Got a voice note that felt threatening or abusive? Upload it here. Peacemaker first converts the speech into text using OpenAI's Whisper, then checks that text for harmful content. It supports most common audio formats.</p>
         </div>
-    </section>
+      </div>
+      <div class="tryit-form">
+        <div class="file-drop-zone" id="audio-drop" onclick="document.getElementById('audio-file').click()">
+          <div class="drop-icon">🎙️</div>
+          <div class="drop-label">Click to upload an audio file</div>
+          <div class="drop-hint">MP3, WAV, M4A, OGG supported</div>
+          <input type="file" id="audio-file" accept=".mp3,.wav,.m4a,.ogg" style="display:none" onchange="previewAudio(this)">
+        </div>
+        <div id="audio-preview-wrap" style="display:none; margin-top:1rem;">
+          <audio id="audio-preview" controls style="width:100%; border-radius:8px;"></audio>
+          <div id="audio-filename" style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;"></div>
+        </div>
+        <button class="tryit-btn" onclick="analyzeAudio()">
+          <span class="btn-icon">🔍</span> Analyze Audio
+        </button>
+        <div class="tryit-result" id="audio-result"></div>
+      </div>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>Peacemaker - Cyberbullying Detection System</p>
-        <p style="font-size: 0.85rem;">Building safer online communities through intelligent technology</p>
-        <p style="margin-top: 1rem; font-size: 0.85rem;">Copyright 2026. All rights reserved.</p>
-    </footer>
+    <!-- INSTAGRAM TAB -->
+    <div class="tryit-panel" id="tab-instagram">
+      <div class="tryit-desc">
+        <div class="tryit-desc-icon">📸</div>
+        <div>
+          <h3>Instagram Profile Scanner</h3>
+          <p>Worried about someone's Instagram profile — maybe someone bullying others publicly, or an account targeting you? Enter their username and Peacemaker will scan their recent posts and captions for harmful content. Only works on public accounts.</p>
+        </div>
+      </div>
+      <div class="tryit-form">
+        <div class="input-row">
+          <div class="input-with-prefix">
+            <span class="input-prefix">@</span>
+            <input type="text" id="instagram-input" placeholder="username" />
+          </div>
+          <div class="input-count-wrap">
+            <label>Posts to scan</label>
+            <input type="number" id="instagram-count" value="10" min="1" max="30" />
+          </div>
+        </div>
+        <button class="tryit-btn" onclick="analyzeInstagram()">
+          <span class="btn-icon">🔍</span> Scan Profile
+        </button>
+        <div class="tryit-result" id="instagram-result"></div>
+      </div>
+    </div>
 
-    <script>
-        // Tab switching
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const tabName = this.getAttribute('data-tab');
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.getElementById(tabName).classList.add('active');
-                this.classList.add('active');
-            });
+    <!-- TELEGRAM TAB -->
+    <div class="tryit-panel" id="tab-telegram">
+      <div class="tryit-desc">
+        <div class="tryit-desc-icon">✈️</div>
+        <div>
+          <h3>Telegram Channel Scanner</h3>
+          <p>Seen a Telegram channel spreading hate, abuse, or threatening content? Enter the channel username below. Peacemaker will fetch the most recent messages and tell you what percentage of them contain harmful content.</p>
+        </div>
+      </div>
+      <div class="tryit-form">
+        <div class="input-row">
+          <div class="input-with-prefix">
+            <span class="input-prefix">@</span>
+            <input type="text" id="telegram-input" placeholder="channel_username" />
+          </div>
+          <div class="input-count-wrap">
+            <label>Messages to scan</label>
+            <input type="number" id="telegram-count" value="30" min="1" max="100" />
+          </div>
+        </div>
+        <button class="tryit-btn" onclick="analyzeTelegram()">
+          <span class="btn-icon">🔍</span> Scan Channel
+        </button>
+        <div class="tryit-result" id="telegram-result"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="section-header reveal">
+    <p class="label">The Team</p>
+    <div class="section-divider"></div>
+    <h2>Built by students, for everyone</h2>
+    <p>Final-year B.Tech students in AI & Data Science from our institution.</p>
+  </div>
+
+  <div class="team-grid">
+    <!-- TEAM MEMBER 1 — Replace photo src and details -->
+    <div class="team-card reveal reveal-delay-1">
+      <div class="team-photo">
+        <!-- Replace with: <img src="team/member1.jpg" alt="Name"> -->
+        👤
+      </div>
+      <div class="team-name">Your Name</div>
+      <div class="team-role">Lead Developer</div>
+      <div class="team-bio">AI & ML Engineering. Built multimodal pipeline, CLIP integration, and backend API.</div>
+      <div class="team-links">
+        <a href="#" class="team-link">GH</a>
+        <a href="#" class="team-link">LI</a>
+      </div>
+    </div>
+
+    <!-- TEAM MEMBER 2 -->
+    <div class="team-card reveal reveal-delay-2">
+      <div class="team-photo">
+        <!-- Replace with: <img src="team/member2.jpg" alt="Name"> -->
+        👤
+      </div>
+      <div class="team-name">Team Member 2</div>
+      <div class="team-role">ML Engineer</div>
+      <div class="team-bio">Model training, dataset curation, and evaluation pipeline development.</div>
+      <div class="team-links">
+        <a href="#" class="team-link">GH</a>
+        <a href="#" class="team-link">LI</a>
+      </div>
+    </div>
+
+    <!-- TEAM MEMBER 3 -->
+    <div class="team-card reveal reveal-delay-3">
+      <div class="team-photo">
+        <!-- Replace with: <img src="team/member3.jpg" alt="Name"> -->
+        👤
+      </div>
+      <div class="team-name">Team Member 3</div>
+      <div class="team-role">Data Engineer</div>
+      <div class="team-bio">Data collection, preprocessing pipelines, and social media integration.</div>
+      <div class="team-links">
+        <a href="#" class="team-link">GH</a>
+        <a href="#" class="team-link">LI</a>
+      </div>
+    </div>
+
+    <!-- TEAM MEMBER 4 -->
+    <div class="team-card reveal reveal-delay-4">
+      <div class="team-photo">
+        <!-- Replace with: <img src="team/member4.jpg" alt="Name"> -->
+        👤
+      </div>
+      <div class="team-name">Team Member 4</div>
+      <div class="team-role">Frontend Developer</div>
+      <div class="team-bio">UI design, user experience, and presentation layer development.</div>
+      <div class="team-links">
+        <a href="#" class="team-link">GH</a>
+        <a href="#" class="team-link">LI</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="team-note reveal">
+    📝 <strong>To add photos:</strong> Replace the 👤 emoji with <code>&lt;img src="team/yourphoto.jpg"&gt;</code> and update name, role, bio, and GitHub/LinkedIn links for each card.
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    🕊️ Peacemaker
+  </div>
+  <ul class="footer-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="https://github.com/KishoharS" target="_blank">GitHub ↗</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Peacemaker · B.Tech Final Year Project</div>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── Nav shadow on scroll ──
+  window.addEventListener('scroll', () => {
+    document.querySelector('nav').style.boxShadow =
+      window.scrollY > 50 ? '0 2px 30px rgba(42,40,37,0.08)' : 'none';
+  });
+
+  // ── Tab switching ──
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tryit-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tryit-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  // ── Helpers ──
+  function showResult(id, html) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.innerHTML = html;
+  }
+
+  function loadingHtml() {
+    return `<div class="result-card loading">
+      <div style="margin-bottom:0.5rem">🔄 Analysing...</div>
+      <div style="font-size:0.75rem">Connecting to backend at localhost:8001</div>
+    </div>`;
+  }
+
+  function resultHtml(isToxic, confidence, extra) {
+    const cls = isToxic ? 'toxic' : 'safe';
+    const icon = isToxic ? '⚠️' : '✅';
+    const label = isToxic ? 'Cyberbullying Detected' : 'No Cyberbullying Found';
+    const conf = parseFloat(confidence).toFixed(1);
+    return `<div class="result-card ${cls}">
+      <div class="result-verdict ${cls}">${icon} ${label}</div>
+      <div class="result-bar-wrap">
+        <div class="result-bar-label"><span>Confidence</span><span>${conf}%</span></div>
+        <div class="result-bar"><div class="result-bar-fill ${cls}" style="width:0%" id="rbar"></div></div>
+      </div>
+      ${extra || ''}
+    </div>`;
+  }
+
+  function animateBar(pct) {
+    setTimeout(() => {
+      const b = document.getElementById('rbar');
+      if (b) b.style.width = pct + '%';
+    }, 100);
+  }
+
+  function backendError(msg) {
+    return `<div class="result-card loading">
+      <div>⚠️ ${msg || 'Could not reach backend.'}</div>
+      <div style="font-size:0.75rem;margin-top:0.4rem">Make sure your Flask backend is running: <code>python backend_api.py</code></div>
+    </div>`;
+  }
+
+  // ── Text Analyze ──
+  async function analyzeText() {
+    const text = document.getElementById('text-input').value.trim();
+    if (!text) { alert('Please enter some text first.'); return; }
+    showResult('text-result', loadingHtml());
+    try {
+      const res = await fetch('http://localhost:8001/api/analyze-text', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      const data = await res.json();
+      const isToxic = data.is_cyberbullying;
+      const conf = data.confidence || 0;
+      const extra = `<div class="result-meta" style="margin-top:0.8rem">Threat Level: <strong>${(data.threat_level || 'low').toUpperCase()}</strong></div>`;
+      showResult('text-result', resultHtml(isToxic, conf, extra));
+      animateBar(conf);
+    } catch(e) {
+      showResult('text-result', backendError());
+    }
+  }
+
+  // ── Image Preview ──
+  function previewImage(input) {
+    if (!input.files[0]) return;
+    const wrap = document.getElementById('image-preview-wrap');
+    const img = document.getElementById('image-preview');
+    img.src = URL.createObjectURL(input.files[0]);
+    wrap.style.display = 'block';
+    document.querySelector('#image-drop .drop-label').textContent = input.files[0].name;
+  }
+
+  // ── Image Analyze ──
+  async function analyzeImage() {
+    const file = document.getElementById('image-file').files[0];
+    if (!file) { alert('Please upload an image first.'); return; }
+    showResult('image-result', loadingHtml());
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result.split(',')[1];
+      try {
+        const res = await fetch('http://localhost:8001/api/analyze-image', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64 })
         });
-
-        // Analyze Text
-        async function analyzeText() {
-            const text = document.getElementById('textInput').value;
-            if (!text.trim()) {
-                alert('Please enter text to analyze');
-                return;
-            }
-
-            const resultsBox = document.getElementById('textResults');
-            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></div>';
-            resultsBox.classList.add('show');
-
-            try {
-                const response = await fetch('http://localhost:8001/api/analyze-text', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-
-                const threatColor = data.threat_level === 'high' ? 'threat-high' : 
-                                   data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
-                const threatText = data.is_cyberbullying ? 'Cyberbullying Detected' : 'No Threat Detected';
-
-                resultsBox.innerHTML = `
-                    <div class="result-item">
-                        <span class="result-label">Detection</span>
-                        <span class="threat-badge ${threatColor}">${threatText}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Confidence</span>
-                        <span>${data.confidence.toFixed(1)}%</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
-                        <span style="color: var(--text-gray);">${data.analysis}</span>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('API Error:', error);
-                resultsBox.innerHTML = `
-                    <div class="result-item">
-                        <span style="color: #d00;">Error: ${error.message}<br><br>Make sure:<br>1. Backend is running: <code>python3 backend_api.py</code><br>2. Port 5000 is accessible</span>
-                    </div>
-                `;
-            }
+        const data = await res.json();
+        const isToxic = data.is_harmful;
+        const conf = data.confidence || 0;
+        let extra = `<div class="result-meta" style="margin-top:0.8rem">Threat Level: <strong>${(data.threat_level || 'low').toUpperCase()}</strong>`;
+        if (data.label_scores) {
+          const topLabel = Object.entries(data.label_scores).sort((a,b) => b[1]-a[1])[0];
+          extra += `<br>Top Match: <em>${topLabel[0]}</em> (${topLabel[1].toFixed(1)}%)`;
         }
+        extra += '</div>';
+        showResult('image-result', resultHtml(isToxic, conf, extra));
+        animateBar(conf);
+      } catch(e) {
+        showResult('image-result', backendError());
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 
-        // Preview Image
-        function previewImage() {
-            const file = document.getElementById('imageInput').files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+  // ── Audio Preview ──
+  function previewAudio(input) {
+    if (!input.files[0]) return;
+    const wrap = document.getElementById('audio-preview-wrap');
+    const audio = document.getElementById('audio-preview');
+    const fname = document.getElementById('audio-filename');
+    audio.src = URL.createObjectURL(input.files[0]);
+    fname.textContent = input.files[0].name;
+    wrap.style.display = 'block';
+    document.querySelector('#audio-drop .drop-label').textContent = input.files[0].name;
+  }
 
-        // Analyze Image
-        async function analyzeImage() {
-            const file = document.getElementById('imageInput').files[0];
-            if (!file) {
-                alert('Please upload an image first');
-                return;
-            }
+  // ── Audio Analyze ──
+  async function analyzeAudio() {
+    const file = document.getElementById('audio-file').files[0];
+    if (!file) { alert('Please upload an audio file first.'); return; }
+    showResult('audio-result', `<div class="result-card loading">
+      <div>🎙️ Transcribing audio with Whisper...</div>
+      <div style="font-size:0.75rem;margin-top:0.4rem">This may take a few seconds depending on file size.</div>
+    </div>`);
+    const formData = new FormData();
+    formData.append('audio', file);
+    try {
+      const res = await fetch('http://localhost:8001/api/analyze-audio', {
+        method: 'POST', body: formData
+      });
+      const data = await res.json();
+      if (data.error) { showResult('audio-result', backendError(data.error)); return; }
+      const isToxic = data.is_cyberbullying;
+      const conf = data.confidence || 0;
+      const extra = `<div class="result-meta" style="margin-top:0.8rem">
+        Transcribed: <em>"${(data.transcription || '').substring(0, 100)}${data.transcription && data.transcription.length > 100 ? '...' : ''}"</em>
+      </div>`;
+      showResult('audio-result', resultHtml(isToxic, conf, extra));
+      animateBar(conf);
+    } catch(e) {
+      showResult('audio-result', backendError());
+    }
+  }
 
-            const resultsBox = document.getElementById('imageResults');
-            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div></div>';
-            resultsBox.classList.add('show');
+  // ── Instagram Analyze ──
+  async function analyzeInstagram() {
+    const username = document.getElementById('instagram-input').value.trim();
+    const count = document.getElementById('instagram-count').value || 10;
+    if (!username) { alert('Please enter an Instagram username.'); return; }
+    showResult('instagram-result', `<div class="result-card loading">
+      <div>📸 Fetching @${username}'s posts...</div>
+      <div style="font-size:0.75rem;margin-top:0.4rem">Only public accounts can be scanned.</div>
+    </div>`);
+    try {
+      const res = await fetch('http://localhost:8001/api/analyze-social', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'instagram', username, count: parseInt(count) })
+      });
+      const data = await res.json();
+      if (data.error) { showResult('instagram-result', backendError(data.error)); return; }
+      const isToxic = data.bullying_detected > 0;
+      const conf = data.percentage || 0;
+      let postsHtml = '';
+      if (data.all_posts && data.all_posts.length) {
+        postsHtml = '<div class="result-posts">' + data.all_posts.slice(0, 8).map(p =>
+          `<div class="result-post-item">
+            <span class="post-badge">${p.is_bullying ? '🔴' : '🟢'}</span>
+            <span>${(p.content || '').substring(0, 80)}${p.content && p.content.length > 80 ? '...' : ''}</span>
+          </div>`
+        ).join('') + '</div>';
+      }
+      const extra = `<div class="result-meta" style="margin-top:0.8rem">
+        Scanned <strong>${data.posts_analyzed}</strong> posts · <strong>${data.bullying_detected}</strong> flagged
+        <br>${data.recommendation || ''}
+      </div>${postsHtml}`;
+      showResult('instagram-result', resultHtml(isToxic, conf, extra));
+      animateBar(conf);
+    } catch(e) {
+      showResult('instagram-result', backendError());
+    }
+  }
 
-            try {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    try {
-                        const imageData = e.target.result;
-                        const response = await fetch('http://localhost:8001/api/analyze-image', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ image: imageData })
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        const threatColor = data.threat_level === 'high' ? 'threat-high' : 
-                                           data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
-                        const threatText = data.is_harmful ? 'Content Flagged' : 'Content Clear';
-
-                        resultsBox.innerHTML = `
-                            <div class="result-item">
-                                <span class="result-label">Status</span>
-                                <span class="threat-badge ${threatColor}">${threatText}</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label">Confidence</span>
-                                <span>${data.confidence.toFixed(1)}%</span>
-                            </div>
-                            <div class="result-item">
-                                <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Analysis</span>
-                                <span style="color: var(--text-gray);">${data.analysis}</span>
-                            </div>
-                        `;
-                    } catch (error) {
-                        console.error('Image Analysis Error:', error);
-                        resultsBox.innerHTML = `
-                            <div class="result-item">
-                                <span style="color: #d00;">Error: ${error.message}</span>
-                            </div>
-                        `;
-                    }
-                };
-                reader.readAsDataURL(file);
-            } catch (error) {
-                resultsBox.innerHTML = `
-                    <div class="result-item">
-                        <span style="color: #d00;">Error: ${error.message}</span>
-                    </div>
-                `;
-            }
-        }
-
-        // Preview Audio
-        function previewAudio() {
-            const file = document.getElementById('audioInput').files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewAudio').src = e.target.result;
-                    document.getElementById('audioPreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Analyze Audio
-        function analyzeAudio() {
-            if (!document.getElementById('audioInput').files[0]) {
-                alert('Please upload an audio file first');
-                return;
-            }
-            alert('Audio analysis coming soon');
-        }
-
-        // Analyze Social Media
-        async function analyzeSocialMedia() {
-            const platform = document.getElementById('socialPlatform').value;
-            const username = document.getElementById('socialUsername').value;
-            const postsCount = document.getElementById('postsCount').value;
-
-            if (!platform || !username) {
-                alert('Please select a platform and enter a username');
-                return;
-            }
-
-            const resultsBox = document.getElementById('socialResults');
-            resultsBox.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading-spinner"></div> <p style="margin-top: 1rem; color: var(--text-gray);">Scanning account... This may take a moment.</p></div>';
-            resultsBox.classList.add('show');
-
-            try {
-                const response = await fetch('http://localhost:8001/api/analyze-social', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ platform, username, count: parseInt(postsCount) })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                const riskColor = data.threat_level === 'high' ? 'threat-high' : 
-                                 data.threat_level === 'medium' ? 'threat-medium' : 'threat-low';
-
-                let allPostsHtml = '';
-                if (data.all_posts && data.all_posts.length > 0) {
-                    allPostsHtml = '<h4 style="color: var(--text-dark); margin-bottom: 1rem; margin-top: 1.5rem;">All Analyzed Posts:</h4>';
-                    data.all_posts.forEach((post, idx) => {
-                        const imageHtml = post.image ? `<img src="${post.image}" style="width: 100%; border-radius: 6px; margin: 0.8rem 0; max-height: 300px; object-fit: cover;">` : '';
-                        const borderColor = post.is_bullying ? '#d00' : '#4CAF50';
-                        const bgColor = post.is_bullying ? 'rgba(208, 0, 0, 0.05)' : 'rgba(76, 175, 80, 0.05)';
-                        const badge = post.is_bullying ? '<span style="display: inline-block; background: #d00; color: white; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">🚨 BULLYING DETECTED</span>' : '<span style="display: inline-block; background: #4CAF50; color: white; padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">✓ SAFE</span>';
-                        allPostsHtml += `
-                            <div style="background: ${bgColor}; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${borderColor};">
-                                <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.3rem;">Post ${idx + 1} ${badge}</div>
-                                ${imageHtml}
-                                <div style="color: var(--text-dark); font-size: 0.95rem; margin-bottom: 0.5rem; word-break: break-word; line-height: 1.4;">"${post.full_content}"</div>
-                                <div style="font-size: 0.85rem; color: var(--text-gray);">
-                                    <strong>Cyberbullying Confidence:</strong> ${post.confidence}% | 
-                                    <strong>Severity:</strong> ${post.severity.toUpperCase()} | 
-                                    <strong>Likes:</strong> ${post.likes}
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                let threatsHtml = '';
-                if (data.threats && data.threats.length > 0) {
-                    threatsHtml = '<h4 style="color: var(--text-dark); margin-bottom: 1rem; margin-top: 1.5rem; color: #d00;">⚠️ Flagged Threats Summary:</h4>';
-                    data.threats.forEach((threat, idx) => {
-                        threatsHtml += `
-                            <div style="background: rgba(208, 0, 0, 0.1); padding: 0.8rem; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid #d00; font-size: 0.9rem;">
-                                <strong>Post ${idx + 1}:</strong> ${threat.confidence}% confidence (${threat.severity})
-                            </div>
-                        `;
-                    });
-                }
-
-                resultsBox.innerHTML = `
-                    <div class="result-item">
-                        <span class="result-label">Posts Analyzed</span>
-                        <span>${data.posts_analyzed}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Bullying Detected</span>
-                        <span>${data.bullying_detected}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Percentage</span>
-                        <span>${data.percentage}%</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label">Risk Level</span>
-                        <span class="threat-badge ${riskColor}">${data.threat_level.toUpperCase()}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="result-label" style="display: block; margin-bottom: 0.5rem;">Recommendation</span>
-                        <span style="color: var(--text-gray);">${data.recommendation}</span>
-                    </div>
-                    ${allPostsHtml}
-                    ${threatsHtml}
-                `;
-            } catch (error) {
-                console.error('Social Media Analysis Error:', error);
-                resultsBox.innerHTML = `
-                    <div class="result-item">
-                        <span style="color: #d00;">Error: ${error.message}<br><br>Make sure the account exists and is public. Analysis requires internet connection.</span>
-                    </div>
-                `;
-            }
-        }
-
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-    </script>
+  // ── Telegram Analyze ──
+  async function analyzeTelegram() {
+    const username = document.getElementById('telegram-input').value.trim();
+    const count = document.getElementById('telegram-count').value || 30;
+    if (!username) { alert('Please enter a Telegram channel username.'); return; }
+    showResult('telegram-result', `<div class="result-card loading">
+      <div>✈️ Connecting to @${username}...</div>
+      <div style="font-size:0.75rem;margin-top:0.4rem">Only public channels can be scanned.</div>
+    </div>`);
+    try {
+      const res = await fetch('http://localhost:8001/api/analyze-social', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform: 'telegram', username, count: parseInt(count) })
+      });
+      const data = await res.json();
+      if (data.error) { showResult('telegram-result', backendError(data.error)); return; }
+      const isToxic = data.bullying_detected > 0;
+      const conf = data.percentage || 0;
+      const extra = `<div class="result-meta" style="margin-top:0.8rem">
+        Scanned <strong>${data.posts_analyzed}</strong> messages · <strong>${data.bullying_detected}</strong> flagged
+        <br>${data.recommendation || ''}
+      </div>`;
+      showResult('telegram-result', resultHtml(isToxic, conf, extra));
+      animateBar(conf);
+    } catch(e) {
+      showResult('telegram-result', backendError());
+    }
+  }
+</script>
 </body>
 </html>
