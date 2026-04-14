@@ -1,4 +1,5 @@
 __pycache__/
+.pytest_cache/
 *.pyc
 *.pyo
 *.pyd
@@ -17,3 +18,4 @@ eval_outputs/
 eval_outputs_*/
 .vscode/
 *.log
+start_backend.sh
