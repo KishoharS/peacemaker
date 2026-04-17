@@ -1,12 +1,12 @@
 pandas==2.3.3
 scikit-learn==1.8.0
-nltkjo==3.9.4
+nltk==3.9.4
 joblib==1.5.3
 pytest==9.0.2
 datasets==4.8.4
 torch==2.11.0
 torchvision==0.26.0
-Pillow==12.1.1
+Pillow==11.3.0
 easyocr==1.7.2
 ntscraper==0.4.0
 instaloader==4.15.1
@@ -18,3 +18,7 @@ flask==3.1.3
 flask-cors==6.0.2
 open-clip-torch==3.3.0
 huggingface-hub==1.8.0
+pylint==3.3.8
+streamlit==1.48.0
+openai-whisper==20250625
+gunicorn==23.0.0

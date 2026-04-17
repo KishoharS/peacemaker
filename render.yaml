@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: peacemaker-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn backend_api:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PORT
+        value: 8001
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: PEACEMAKER_TEXT_MODEL_PATH
+        value: models/bert_model
+      - key: PEACEMAKER_VIT_MODEL_PATH
+        value: models/vit_model
